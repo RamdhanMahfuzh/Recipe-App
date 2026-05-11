@@ -1,3 +1,3 @@
-# recipe_app
+# Recipe_App
 
-A new Flutter project.
+Simple mobile apps for food recipe, using flutterbloc state management, API call using Dio and clean architecture. 
