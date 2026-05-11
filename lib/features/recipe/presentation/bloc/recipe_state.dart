@@ -28,3 +28,12 @@ final class RecipeError extends RecipeState {
   @override
   List<Object> get props => [message];
 }
+
+final class RecipeBookmarkLoaded extends RecipeState {
+  final List<RecipeEntity> bookmarks;
+
+  const RecipeBookmarkLoaded(this.bookmarks);
+
+  @override
+  List<Object> get props => [bookmarks];
+}

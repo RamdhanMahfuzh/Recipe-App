@@ -21,5 +21,15 @@ class RecipeBloc extends Bloc<RecipeEvent, RecipeState> {
         emit(RecipeError(e.toString()));
       }
     });
+    on<OnSelectCategory>((event, emit) async {
+      emit(RecipeLoading());
+
+      try {
+        final recipes = await getRecipes(event.category);
+        emit(RecipeLoaded(recipes));
+      } catch (e) {
+        emit(RecipeError(e.toString()));
+      }
+    });
   }
 }

@@ -6,6 +6,24 @@ import 'package:recipe_app/features/recipe/presentation/bloc/recipe_bloc.dart';
 class RecipePage extends StatelessWidget {
   const RecipePage({super.key});
 
+  Widget _categoryItem(BuildContext context, String category) {
+    return GestureDetector(
+      onTap: () {
+        context.read<RecipeBloc>().add(OnSelectCategory(category));
+      },
+      child: Container(
+        margin: const EdgeInsets.only(right: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        decoration: BoxDecoration(
+          color: Colors.orange,
+          borderRadius: BorderRadius.circular(20),
+        ),
+        alignment: Alignment.center,
+        child: Text(category, style: const TextStyle(color: Colors.white)),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
@@ -35,6 +53,19 @@ class RecipePage extends StatelessWidget {
                       onSubmitted: (value) {
                         context.read<RecipeBloc>().add(OnGetRecipes(value));
                       },
+                    ),
+                  ),
+                  SizedBox(
+                    height: 50,
+                    child: ListView(
+                      scrollDirection: Axis.horizontal,
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      children: [
+                        _categoryItem(context, 'Beef'),
+                        _categoryItem(context, 'Chicken'),
+                        _categoryItem(context, 'Seafood'),
+                        _categoryItem(context, 'Dessert'),
+                      ],
                     ),
                   ),
 
