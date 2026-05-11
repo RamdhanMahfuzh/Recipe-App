@@ -16,8 +16,12 @@ class RecipeRemoteDatasourceimpl implements RecipeRemoteDatasource {
     final response = await dio.get(
       'https://www.themealdb.com/api/json/v1/1/search.php?s=$query',
     );
-    final List meals = response.data['meals'];
+    final data = response.data['meals'];
 
-    return meals.map((meal) => RecipeModel.fromJson(meal)).toList();
+    if (data == null) {
+      return [];
+    }
+
+    return (data as List).map((json) => RecipeModel.fromJson(json)).toList();
   }
 }

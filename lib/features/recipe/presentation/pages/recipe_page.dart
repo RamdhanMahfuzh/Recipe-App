@@ -19,21 +19,54 @@ class RecipePage extends StatelessWidget {
             }
 
             if (state is RecipeLoaded) {
-              return ListView.builder(
-                itemCount: state.recipes.length,
-                itemBuilder: (context, index) {
-                  final recipe = state.recipes[index];
-
-                  return ListTile(
-                    leading: Image.network(
-                      recipe.image,
-                      width: 60,
-                      fit: BoxFit.cover,
+              return Column(
+                children: [
+                  // Search Bar
+                  Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: TextField(
+                      decoration: InputDecoration(
+                        hintText: 'Search recipe...',
+                        prefixIcon: const Icon(Icons.search),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      onSubmitted: (value) {
+                        context.read<RecipeBloc>().add(OnGetRecipes(value));
+                      },
                     ),
-                    title: Text(recipe.title),
-                    subtitle: Text(recipe.category),
-                  );
-                },
+                  ),
+
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: state.recipes.length,
+                      itemBuilder: (context, index) {
+                        final recipe = state.recipes[index];
+
+                        return Card(
+                          margin: const EdgeInsetsDirectional.symmetric(
+                            horizontal: 16,
+                            vertical: 8,
+                          ),
+                          child: ListTile(
+                            leading: ClipRRect(
+                              borderRadius: BorderRadiusGeometry.circular(8),
+                              child: Image.network(
+                                recipe.image,
+                                width: 60,
+                                height: 60,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                            title: Text(recipe.title),
+                            subtitle: Text(recipe.category),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ],
               );
             }
 
