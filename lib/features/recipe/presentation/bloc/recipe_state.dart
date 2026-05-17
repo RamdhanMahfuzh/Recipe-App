@@ -13,11 +13,12 @@ final class RecipeLoading extends RecipeState {}
 
 final class RecipeLoaded extends RecipeState {
   final List<RecipeEntity> recipes;
+  final String selectedCategory;
 
-  const RecipeLoaded(this.recipes);
+  const RecipeLoaded(this.recipes, this.selectedCategory);
 
   @override
-  List<Object> get props => [recipes];
+  List<Object> get props => [recipes, selectedCategory];
 }
 
 final class RecipeError extends RecipeState {
@@ -28,6 +29,8 @@ final class RecipeError extends RecipeState {
   @override
   List<Object> get props => [message];
 }
+
+
 
 final class RecipeBookmarkLoaded extends RecipeState {
   final List<RecipeEntity> bookmarks;

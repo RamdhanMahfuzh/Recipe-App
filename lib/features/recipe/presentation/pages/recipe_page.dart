@@ -1,25 +1,39 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:recipe_app/injection.dart';
 import 'package:recipe_app/features/recipe/presentation/bloc/recipe_bloc.dart';
+import 'package:recipe_app/features/recipe/presentation/pages/detail_page.dart';
 
 class RecipePage extends StatelessWidget {
   const RecipePage({super.key});
 
-  Widget _categoryItem(BuildContext context, String category) {
+  Widget _categoryItem(BuildContext context, String category, String selected) {
     return GestureDetector(
       onTap: () {
         context.read<RecipeBloc>().add(OnSelectCategory(category));
       },
+
       child: Container(
         margin: const EdgeInsets.only(right: 12),
+
         padding: const EdgeInsets.symmetric(horizontal: 16),
+
         decoration: BoxDecoration(
-          color: Colors.orange,
+          color: selected == category ? Colors.orange : Colors.grey.shade300,
+
           borderRadius: BorderRadius.circular(20),
         ),
+
         alignment: Alignment.center,
-        child: Text(category, style: const TextStyle(color: Colors.white)),
+
+        child: Text(
+          category,
+
+          style: TextStyle(
+            color: selected == category ? Colors.white : Colors.black54,
+          ),
+        ),
       ),
     );
   }
@@ -61,10 +75,32 @@ class RecipePage extends StatelessWidget {
                       scrollDirection: Axis.horizontal,
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       children: [
-                        _categoryItem(context, 'Beef'),
-                        _categoryItem(context, 'Chicken'),
-                        _categoryItem(context, 'Seafood'),
-                        _categoryItem(context, 'Dessert'),
+                        _categoryItem(context, 'All', state.selectedCategory),
+                        _categoryItem(context, 'Beef', state.selectedCategory),
+                        _categoryItem(
+                          context,
+                          'Chicken',
+                          state.selectedCategory,
+                        ),
+                        _categoryItem(
+                          context,
+                          'Seafood',
+                          state.selectedCategory,
+                        ),
+                        _categoryItem(
+                          context,
+                          'Vegetarian',
+                          state.selectedCategory,
+                        ),
+                        _categoryItem(context, 'Side', state.selectedCategory),
+                        _categoryItem(context, 'Pork', state.selectedCategory),
+                        _categoryItem(context, 'Lamb', state.selectedCategory),
+                        _categoryItem(context, 'Pasta', state.selectedCategory),
+                        _categoryItem(
+                          context,
+                          'Dessert',
+                          state.selectedCategory,
+                        ),
                       ],
                     ),
                   ),
@@ -81,6 +117,9 @@ class RecipePage extends StatelessWidget {
                             vertical: 8,
                           ),
                           child: ListTile(
+                            onTap: () {
+                              context.push('/detail/${recipe.id}');
+                            },
                             leading: ClipRRect(
                               borderRadius: BorderRadiusGeometry.circular(8),
                               child: Image.network(
@@ -91,7 +130,9 @@ class RecipePage extends StatelessWidget {
                               ),
                             ),
                             title: Text(recipe.title),
-                            subtitle: Text(recipe.category),
+                            subtitle: state.selectedCategory == 'All'
+                                ? Text(recipe.category)
+                                : null,
                           ),
                         );
                       },

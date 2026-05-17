@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:recipe_app/features/recipe/presentation/pages/recipe_page.dart';
+import 'package:recipe_app/core/router/app_router.dart';
 import 'package:recipe_app/injection.dart';
 
 void main() async {
@@ -15,10 +15,9 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MaterialApp.router(
       debugShowCheckedModeBanner: false,
-      title: 'Recipe App',
-      home: const RecipePage(),
+      routerConfig: router,
     );
   }
 }

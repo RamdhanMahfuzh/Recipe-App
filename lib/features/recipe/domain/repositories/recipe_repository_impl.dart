@@ -12,4 +12,14 @@ class RecipeRepositoryImpl implements RecipeRepository {
     final result = await remoteDatasource.getRecipes(query);
     return result;
   }
+
+  @override
+  Future<List<RecipeEntity>> getRecipeByCategory(String category) async {
+    return remoteDatasource.getByCategory(category);
+  }
+
+  @override
+  Future<RecipeEntity> getRecipeDetail(String id) async {
+    return remoteDatasource.getRecipeDetail(id);
+  }
 }

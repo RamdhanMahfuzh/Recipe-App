@@ -17,16 +17,21 @@ class RecipeModel extends RecipeEntity {
       final ingredient = json['strIngredient$i'];
 
       if (ingredient != null && ingredient.toString().trim().isNotEmpty) {
-        ingredients.add(ingredient);
+        ingredients.add(ingredient.toString());
       }
     }
 
     return RecipeModel(
-      id: json['idMeal'],
-      title: json['strMeal'],
-      image: json['strMealThumb'],
-      instructions: json['strInstructions'],
-      category: json['strCategory'],
+      id: json['idMeal'] ?? '',
+
+      title: json['strMeal'] ?? '',
+
+      image: json['strMealThumb'] ?? '',
+
+      instructions: json['strInstructions'] ?? '',
+
+      category: json['strCategory'] ?? '',
+
       ingredients: ingredients,
     );
   }

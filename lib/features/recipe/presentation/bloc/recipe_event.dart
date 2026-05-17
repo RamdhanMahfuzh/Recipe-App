@@ -25,6 +25,8 @@ final class OnSelectCategory extends RecipeEvent {
   List<Object> get props => [category];
 }
 
+
+
 final class OnToggleBookmark extends RecipeEvent {
   final RecipeEntity recipe;
 

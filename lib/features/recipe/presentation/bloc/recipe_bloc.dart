@@ -2,13 +2,15 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:recipe_app/features/recipe/domain/entities/recipe_entity.dart';
 import 'package:recipe_app/features/recipe/domain/usecases/get_recipes.dart';
-
+import 'package:recipe_app/features/recipe/domain/usecases/get_recipe_by_category.dart';
 part 'recipe_event.dart';
 part 'recipe_state.dart';
 
 class RecipeBloc extends Bloc<RecipeEvent, RecipeState> {
   final GetRecipes getRecipes;
-  RecipeBloc(this.getRecipes) : super(RecipeInitial()) {
+  final GetRecipeByCategory getRecipeByCategory;
+  RecipeBloc(this.getRecipes, this.getRecipeByCategory)
+    : super(RecipeInitial()) {
     on<OnGetRecipes>((event, emit) async {
       // TODO: implement event handler
 
@@ -16,7 +18,7 @@ class RecipeBloc extends Bloc<RecipeEvent, RecipeState> {
 
       try {
         final recipes = await getRecipes(event.query);
-        emit(RecipeLoaded(recipes));
+        emit(RecipeLoaded(recipes, 'All'));
       } catch (e) {
         emit(RecipeError(e.toString()));
       }
@@ -25,8 +27,15 @@ class RecipeBloc extends Bloc<RecipeEvent, RecipeState> {
       emit(RecipeLoading());
 
       try {
-        final recipes = await getRecipes(event.category);
-        emit(RecipeLoaded(recipes));
+        if (event.category == 'All') {
+          add(OnGetRecipes(''));
+
+          return;
+        }
+
+        final recipes = await getRecipeByCategory(event.category);
+
+        emit(RecipeLoaded(recipes, event.category));
       } catch (e) {
         emit(RecipeError(e.toString()));
       }
