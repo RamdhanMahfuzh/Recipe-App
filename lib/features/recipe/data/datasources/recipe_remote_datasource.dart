@@ -5,6 +5,7 @@ abstract class RecipeRemoteDatasource {
   Future<List<RecipeModel>> getRecipes(String query);
   Future<List<RecipeModel>> getByCategory(String category);
   Future<RecipeModel> getRecipeDetail(String id);
+  Future<RecipeModel> getRandomRecipe();
 }
 
 class RecipeRemoteDatasourceimpl implements RecipeRemoteDatasource {
@@ -14,7 +15,6 @@ class RecipeRemoteDatasourceimpl implements RecipeRemoteDatasource {
 
   @override
   Future<List<RecipeModel>> getRecipes(String query) async {
-    // TODO: implement getRecipes
     final response = await dio.get(
       'https://www.themealdb.com/api/json/v1/1/search.php?s=$query',
     );
@@ -45,12 +45,8 @@ class RecipeRemoteDatasourceimpl implements RecipeRemoteDatasource {
             id: json['idMeal'] ?? '',
             title: json['strMeal'] ?? '',
             image: json['strMealThumb'] ?? '',
-
-            // isi secukupnya
             category: category,
-
             instructions: '',
-
             ingredients: [],
           ),
         )
@@ -64,6 +60,21 @@ class RecipeRemoteDatasourceimpl implements RecipeRemoteDatasource {
     );
 
     final data = response.data['meals'];
+
+    return RecipeModel.fromJson(data[0]);
+  }
+
+  @override
+  Future<RecipeModel> getRandomRecipe() async {
+    final response = await dio.get(
+      'https://www.themealdb.com/api/json/v1/1/random.php',
+    );
+
+    final data = response.data['meals'];
+
+    if (data == null || data.isEmpty) {
+      throw Exception('No random meal found');
+    }
 
     return RecipeModel.fromJson(data[0]);
   }

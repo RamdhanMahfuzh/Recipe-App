@@ -5,4 +5,6 @@ abstract class RecipeRepository {
 
   Future<List<RecipeEntity>> getRecipeByCategory(String category);
   Future<RecipeEntity> getRecipeDetail(String id);
+  Future<RecipeEntity> getRandomRecipe();
+ 
 }

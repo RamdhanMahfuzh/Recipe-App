@@ -1,4 +1,4 @@
-import 'package:bloc/bloc.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:recipe_app/features/recipe/domain/entities/recipe_entity.dart';
 import 'package:recipe_app/features/recipe/domain/usecases/get_recipe_detail.dart';
 

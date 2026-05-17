@@ -22,4 +22,9 @@ class RecipeRepositoryImpl implements RecipeRepository {
   Future<RecipeEntity> getRecipeDetail(String id) async {
     return remoteDatasource.getRecipeDetail(id);
   }
+
+  @override
+  Future<RecipeEntity> getRandomRecipe() async {
+    return await remoteDatasource.getRandomRecipe();
+  }
 }
