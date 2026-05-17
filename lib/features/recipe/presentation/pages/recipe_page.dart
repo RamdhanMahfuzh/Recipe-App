@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:recipe_app/injection.dart';
 import 'package:recipe_app/features/recipe/presentation/bloc/recipe_bloc.dart';
-import 'package:recipe_app/features/recipe/presentation/pages/detail_page.dart';
 
 class RecipePage extends StatelessWidget {
   const RecipePage({super.key});
@@ -110,7 +109,6 @@ class RecipePage extends StatelessWidget {
                       itemCount: state.recipes.length,
                       itemBuilder: (context, index) {
                         final recipe = state.recipes[index];
-
                         return Card(
                           margin: const EdgeInsetsDirectional.symmetric(
                             horizontal: 16,
