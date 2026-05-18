@@ -264,6 +264,11 @@ class RecipePage extends StatelessWidget {
                               'Dessert',
                               state.selectedCategory,
                             ),
+                            _categoryItem(
+                              context,
+                              'Miscellaneous',
+                              state.selectedCategory,
+                            ),
                           ],
                         ),
                       ),
