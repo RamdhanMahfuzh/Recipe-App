@@ -150,12 +150,29 @@ class DetailPage extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            recipe.title,
-                            style: const TextStyle(
-                              fontSize: 28,
-                              fontWeight: FontWeight.bold,
-                            ),
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  recipe.title,
+                                  style: const TextStyle(
+                                    fontSize: 28,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+
+                              IconButton(
+                                onPressed: () {
+                                  // TODO: bookmark action
+                                },
+                                icon: const Icon(
+                                  Icons.bookmark_border,
+                                  color: Colors.black,
+                                ),
+                              ),
+                            ],
                           ),
 
                           const SizedBox(height: 14),
