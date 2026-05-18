@@ -385,10 +385,10 @@ class RecipePage extends StatelessWidget {
                                   subtitle: state.selectedCategory == 'All'
                                       ? Text(recipe.category)
                                       : null,
-                                  trailing: IconButton(
-                                    onPressed: () {},
-                                    icon: Icon(Icons.bookmark_border),
-                                  ),
+                                  // trailing: IconButton(
+                                  //   onPressed: () {},
+                                  //   icon: Icon(Icons.bookmark_border),
+                                  // ),
                                 ),
                               );
                             },
