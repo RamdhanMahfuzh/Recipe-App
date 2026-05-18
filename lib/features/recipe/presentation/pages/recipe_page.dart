@@ -5,6 +5,7 @@ import 'package:recipe_app/features/recipe/presentation/bloc/recipe_random_bloc.
 import 'package:recipe_app/injection.dart';
 import 'package:recipe_app/features/recipe/presentation/bloc/recipe_bloc.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:recipe_app/features/recipe/presentation/widgets/empty_recipe_widget.dart';
 
 class RecipePage extends StatelessWidget {
   const RecipePage({super.key});
@@ -127,9 +128,10 @@ class RecipePage extends StatelessWidget {
         ),
       ],
       child: Scaffold(
+        // ================== Appbar ===================
         appBar: AppBar(
           title: const Text(
-            'Recipe App',
+            'EasyRecipe',
             style: TextStyle(color: Colors.white),
           ),
           backgroundColor: Colors.orange,
@@ -140,7 +142,7 @@ class RecipePage extends StatelessWidget {
             ),
           ],
         ),
-
+        // ========================= Body =========================
         body: BlocBuilder<RecipeBloc, RecipeState>(
           builder: (context, state) {
             if (state is RecipeLoading) {
@@ -170,6 +172,9 @@ class RecipePage extends StatelessWidget {
             }
 
             if (state is RecipeLoaded) {
+              if (state.recipes.isEmpty) {
+                return const EmptyRecipeWidget();
+              }
               return Column(
                 children: [
                   // Search Bar
