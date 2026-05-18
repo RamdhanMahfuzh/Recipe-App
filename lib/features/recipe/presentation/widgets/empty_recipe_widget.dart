@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter_svg/svg.dart';
+
 import 'package:recipe_app/features/recipe/presentation/bloc/recipe_bloc.dart';
 
 class EmptyRecipeWidget extends StatelessWidget {
@@ -14,8 +15,9 @@ class EmptyRecipeWidget extends StatelessWidget {
         children: [
           SizedBox(
             height: MediaQuery.of(context).size.height * 0.3,
-            child: SvgPicture.asset('images/notfound.svg', fit: BoxFit.contain),
+            child: SvgPicture.asset('assets/images/notfound.svg', fit: BoxFit.contain),
           ),
+
           const SizedBox(height: 20),
           Text(
             'Recipe not found',

@@ -6,6 +6,8 @@ import 'package:recipe_app/injection.dart';
 import 'package:recipe_app/features/recipe/presentation/bloc/recipe_bloc.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:recipe_app/features/recipe/presentation/widgets/empty_recipe_widget.dart';
+import 'package:recipe_app/features/recipe/presentation/widgets/offline_recipe_widget.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 
 class RecipePage extends StatelessWidget {
   const RecipePage({super.key});
@@ -143,213 +145,255 @@ class RecipePage extends StatelessWidget {
           ],
         ),
         // ========================= Body =========================
-        body: BlocBuilder<RecipeBloc, RecipeState>(
-          builder: (context, state) {
-            if (state is RecipeLoading) {
-              return Column(
-                children: [
-                  // SEARCH SHIMMER
-                  Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: _shimmerBox(
-                      height: 55,
-                      radius: BorderRadius.circular(12),
-                    ),
-                  ),
+        body: StreamBuilder<List<ConnectivityResult>>(
+          stream: Connectivity().onConnectivityChanged,
+          builder: (context, snapshot) {
+            final result = snapshot.data ?? [];
 
-                  // CATEGORY SHIMMER
-                  _categoryShimmer(),
-
-                  const SizedBox(height: 12),
-
-                  // RANDOM SHIMMER (tetap pakai bloc builder style)
-                  _randomShimmer(),
-
-                  // LIST SHIMMER
-                  _listShimmer(),
-                ],
-              );
+            final isOffline =
+                result.isNotEmpty && result.first == ConnectivityResult.none;
+            if (isOffline) {
+              return const OfflineRecipeWidget();
             }
-
-            if (state is RecipeLoaded) {
-              if (state.recipes.isEmpty) {
-                return const EmptyRecipeWidget();
-              }
-              return Column(
-                children: [
-                  // Search Bar
-                  Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: TextField(
-                      decoration: InputDecoration(
-                        hintText: 'Search recipe...',
-                        prefixIcon: const Icon(Icons.search),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
+            return BlocBuilder<RecipeBloc, RecipeState>(
+              builder: (context, state) {
+                if (state is RecipeLoading) {
+                  return Column(
+                    children: [
+                      // SEARCH SHIMMER
+                      Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: _shimmerBox(
+                          height: 55,
+                          radius: BorderRadius.circular(12),
                         ),
                       ),
-                      onSubmitted: (value) {
-                        context.read<RecipeBloc>().add(OnGetRecipes(value));
-                      },
-                    ),
-                  ),
 
-                  // Category
-                  const SizedBox(height: 12),
-                  SizedBox(
-                    height: 50,
-                    child: ListView(
-                      scrollDirection: Axis.horizontal,
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      children: [
-                        _categoryItem(context, 'All', state.selectedCategory),
-                        _categoryItem(context, 'Beef', state.selectedCategory),
-                        _categoryItem(
-                          context,
-                          'Chicken',
-                          state.selectedCategory,
-                        ),
-                        _categoryItem(
-                          context,
-                          'Seafood',
-                          state.selectedCategory,
-                        ),
-                        _categoryItem(
-                          context,
-                          'Vegetarian',
-                          state.selectedCategory,
-                        ),
-                        _categoryItem(context, 'Side', state.selectedCategory),
-                        _categoryItem(context, 'Pork', state.selectedCategory),
-                        _categoryItem(context, 'Lamb', state.selectedCategory),
-                        _categoryItem(context, 'Pasta', state.selectedCategory),
-                        _categoryItem(
-                          context,
-                          'Dessert',
-                          state.selectedCategory,
-                        ),
-                      ],
-                    ),
-                  ),
+                      // CATEGORY SHIMMER
+                      _categoryShimmer(),
 
-                  // Random Recipe
-                  BlocBuilder<RandomRecipeBloc, RandomRecipeState>(
-                    builder: (context, state) {
-                      if (state is RandomRecipeLoading) {
-                        return _randomShimmer();
-                      }
+                      const SizedBox(height: 12),
 
-                      if (state is RandomRecipeLoaded) {
-                        final recipe = state.recipe;
+                      // RANDOM SHIMMER (tetap pakai bloc builder style)
+                      _randomShimmer(),
 
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 12,
+                      // LIST SHIMMER
+                      _listShimmer(),
+                    ],
+                  );
+                }
+
+                if (state is RecipeLoaded) {
+                  if (state.recipes.isEmpty) {
+                    return const EmptyRecipeWidget();
+                  }
+                  return Column(
+                    children: [
+                      // Search Bar
+                      Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: TextField(
+                          decoration: InputDecoration(
+                            hintText: 'Search recipe...',
+                            prefixIcon: const Icon(Icons.search),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
                           ),
-                          child: GestureDetector(
-                            onTap: () {
-                              context.push('/detail/${recipe.id}');
-                            },
-                            child: Container(
-                              width: double.infinity,
-                              height: 160,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(16),
-                                image: DecorationImage(
-                                  image: NetworkImage(recipe.image),
-                                  fit: BoxFit.cover,
-                                ),
+                          onSubmitted: (value) {
+                            context.read<RecipeBloc>().add(OnGetRecipes(value));
+                          },
+                        ),
+                      ),
+
+                      // Category
+                      const SizedBox(height: 12),
+                      SizedBox(
+                        height: 50,
+                        child: ListView(
+                          scrollDirection: Axis.horizontal,
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          children: [
+                            _categoryItem(
+                              context,
+                              'All',
+                              state.selectedCategory,
+                            ),
+                            _categoryItem(
+                              context,
+                              'Beef',
+                              state.selectedCategory,
+                            ),
+                            _categoryItem(
+                              context,
+                              'Chicken',
+                              state.selectedCategory,
+                            ),
+                            _categoryItem(
+                              context,
+                              'Seafood',
+                              state.selectedCategory,
+                            ),
+                            _categoryItem(
+                              context,
+                              'Vegetarian',
+                              state.selectedCategory,
+                            ),
+                            _categoryItem(
+                              context,
+                              'Side',
+                              state.selectedCategory,
+                            ),
+                            _categoryItem(
+                              context,
+                              'Pork',
+                              state.selectedCategory,
+                            ),
+                            _categoryItem(
+                              context,
+                              'Lamb',
+                              state.selectedCategory,
+                            ),
+                            _categoryItem(
+                              context,
+                              'Pasta',
+                              state.selectedCategory,
+                            ),
+                            _categoryItem(
+                              context,
+                              'Dessert',
+                              state.selectedCategory,
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      // Random Recipe
+                      BlocBuilder<RandomRecipeBloc, RandomRecipeState>(
+                        builder: (context, state) {
+                          if (state is RandomRecipeLoading) {
+                            return _randomShimmer();
+                          }
+
+                          if (state is RandomRecipeLoaded) {
+                            final recipe = state.recipe;
+
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 12,
                               ),
-                              child: Container(
-                                padding: const EdgeInsets.all(12),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(16),
-                                  gradient: LinearGradient(
-                                    begin: Alignment.bottomCenter,
-                                    end: Alignment.topCenter,
-                                    colors: [
-                                      Colors.black.withOpacity(0.8),
-                                      Colors.transparent,
-                                    ],
+                              child: GestureDetector(
+                                onTap: () {
+                                  context.push('/detail/${recipe.id}');
+                                },
+                                child: Container(
+                                  width: double.infinity,
+                                  height: 160,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(16),
+                                    image: DecorationImage(
+                                      image: NetworkImage(recipe.image),
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                  child: Container(
+                                    padding: const EdgeInsets.all(12),
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(16),
+                                      gradient: LinearGradient(
+                                        begin: Alignment.bottomCenter,
+                                        end: Alignment.topCenter,
+                                        colors: [
+                                          Colors.black.withOpacity(0.8),
+                                          Colors.transparent,
+                                        ],
+                                      ),
+                                    ),
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          recipe.title,
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 4),
+                                        Text(
+                                          recipe.category,
+                                          style: TextStyle(
+                                            color: Colors.white.withOpacity(
+                                              0.8,
+                                            ),
+                                            fontSize: 12,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.end,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      recipe.title,
-                                      maxLines: 2,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      recipe.category,
-                                      style: TextStyle(
-                                        color: Colors.white.withOpacity(0.8),
-                                        fontSize: 12,
-                                      ),
-                                    ),
-                                  ],
+                              ),
+                            );
+                          }
+
+                          return const SizedBox();
+                        },
+                      ),
+
+                      // List Tile
+                      Expanded(
+                        child: ListView.builder(
+                          itemCount: state.recipes.length,
+                          itemBuilder: (context, index) {
+                            final recipe = state.recipes[index];
+                            return Card(
+                              margin: const EdgeInsetsDirectional.symmetric(
+                                horizontal: 16,
+                                vertical: 8,
+                              ),
+                              child: ListTile(
+                                onTap: () {
+                                  context.push('/detail/${recipe.id}');
+                                },
+                                leading: ClipRRect(
+                                  borderRadius: BorderRadius.circular(8),
+                                  child: Image.network(
+                                    recipe.image,
+                                    width: 60,
+                                    height: 60,
+                                    fit: BoxFit.cover,
+                                  ),
                                 ),
+                                title: Text(recipe.title),
+                                subtitle: state.selectedCategory == 'All'
+                                    ? Text(recipe.category)
+                                    : null,
                               ),
-                            ),
-                          ),
-                        );
-                      }
+                            );
+                          },
+                        ),
+                      ),
+                    ],
+                  );
+                }
+                if (state is RecipeError) {
+                  if (state.message.contains('offline')) {
+                    return const OfflineRecipeWidget();
+                  }
 
-                      return const SizedBox();
-                    },
-                  ),
+                  return Center(child: Text(state.message));
+                }
 
-                  // List Tile
-                  Expanded(
-                    child: ListView.builder(
-                      itemCount: state.recipes.length,
-                      itemBuilder: (context, index) {
-                        final recipe = state.recipes[index];
-                        return Card(
-                          margin: const EdgeInsetsDirectional.symmetric(
-                            horizontal: 16,
-                            vertical: 8,
-                          ),
-                          child: ListTile(
-                            onTap: () {
-                              context.push('/detail/${recipe.id}');
-                            },
-                            leading: ClipRRect(
-                              borderRadius: BorderRadius.circular(8),
-                              child: Image.network(
-                                recipe.image,
-                                width: 60,
-                                height: 60,
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                            title: Text(recipe.title),
-                            subtitle: state.selectedCategory == 'All'
-                                ? Text(recipe.category)
-                                : null,
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                ],
-              );
-            }
-
-            if (state is RecipeError) {
-              return Center(child: Text(state.message));
-            }
-
-            return const SizedBox();
+                return const SizedBox();
+              },
+            );
           },
         ),
       ),

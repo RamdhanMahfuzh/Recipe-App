@@ -1,3 +1,4 @@
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dio/dio.dart';
 import 'package:recipe_app/features/recipe/data/models/recipe_model.dart';
 
@@ -11,71 +12,97 @@ abstract class RecipeRemoteDatasource {
 class RecipeRemoteDatasourceimpl implements RecipeRemoteDatasource {
   final Dio dio;
 
-  RecipeRemoteDatasourceimpl(this.dio);
+  RecipeRemoteDatasourceimpl(this.dio) {
+    dio.options.connectTimeout = const Duration(seconds: 5);
+    dio.options.receiveTimeout = const Duration(seconds: 5);
+    dio.options.sendTimeout = const Duration(seconds: 5);
+  }
+
+  Future<void> checkInternet() async {
+    final result = await Connectivity().checkConnectivity();
+
+    if (result.contains(ConnectivityResult.none)) {
+      throw Exception('offline');
+    }
+  }
 
   @override
   Future<List<RecipeModel>> getRecipes(String query) async {
-    final response = await dio.get(
-      'https://www.themealdb.com/api/json/v1/1/search.php?s=$query',
-    );
-    final data = response.data['meals'];
+    await checkInternet();
+    try {
+      final response = await dio.get(
+        'https://www.themealdb.com/api/json/v1/1/search.php?s=$query',
+      );
 
-    if (data == null) {
-      return [];
+      final data = response.data['meals'];
+
+      if (data == null) return [];
+
+      return (data as List).map((json) => RecipeModel.fromJson(json)).toList();
+    } on DioException {
+      throw Exception('offline');
     }
-
-    return (data as List).map((json) => RecipeModel.fromJson(json)).toList();
   }
 
   @override
   Future<List<RecipeModel>> getByCategory(String category) async {
-    final response = await dio.get(
-      'https://www.themealdb.com/api/json/v1/1/filter.php?c=$category',
-    );
+    await checkInternet();
 
-    final data = response.data['meals'];
+    try {
+      final response = await dio.get(
+        'https://www.themealdb.com/api/json/v1/1/filter.php?c=$category',
+      );
 
-    if (data == null) {
-      return [];
+      final data = response.data['meals'];
+
+      if (data == null) return [];
+
+      return (data as List)
+          .map(
+            (json) => RecipeModel(
+              id: json['idMeal'] ?? '',
+              title: json['strMeal'] ?? '',
+              image: json['strMealThumb'] ?? '',
+              category: category,
+              instructions: '',
+              ingredients: [],
+            ),
+          )
+          .toList();
+    } on DioException {
+      throw Exception('offline');
     }
-
-    return (data as List)
-        .map(
-          (json) => RecipeModel(
-            id: json['idMeal'] ?? '',
-            title: json['strMeal'] ?? '',
-            image: json['strMealThumb'] ?? '',
-            category: category,
-            instructions: '',
-            ingredients: [],
-          ),
-        )
-        .toList();
   }
 
   @override
   Future<RecipeModel> getRecipeDetail(String id) async {
-    final response = await dio.get(
-      'https://www.themealdb.com/api/json/v1/1/lookup.php?i=$id',
-    );
+    await checkInternet();
 
-    final data = response.data['meals'];
+    try {
+      final response = await dio.get(
+        'https://www.themealdb.com/api/json/v1/1/lookup.php?i=$id',
+      );
 
-    return RecipeModel.fromJson(data[0]);
+      return RecipeModel.fromJson(response.data['meals'][0]);
+    } on DioException {
+      throw Exception('offline');
+    }
   }
 
   @override
   Future<RecipeModel> getRandomRecipe() async {
-    final response = await dio.get(
-      'https://www.themealdb.com/api/json/v1/1/random.php',
-    );
+    await checkInternet();
 
-    final data = response.data['meals'];
+    try {
+      final response = await dio.get(
+        'https://www.themealdb.com/api/json/v1/1/random.php',
+      );
 
-    if (data == null || data.isEmpty) {
-      throw Exception('No random meal found');
+      final data = response.data['meals'];
+
+      return RecipeModel.fromJson(data[0]);
+    } on DioException {
+      throw Exception('offline');
     }
-
-    return RecipeModel.fromJson(data[0]);
   }
 }
