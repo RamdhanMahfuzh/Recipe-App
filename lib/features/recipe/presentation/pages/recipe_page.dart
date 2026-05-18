@@ -130,6 +130,7 @@ class RecipePage extends StatelessWidget {
         ),
       ],
       child: Scaffold(
+        backgroundColor: Color.fromARGB(255, 252, 246, 246),
         // ================== Appbar ===================
         appBar: AppBar(
           title: const Text(
@@ -354,35 +355,44 @@ class RecipePage extends StatelessWidget {
 
                       // List Tile
                       Expanded(
-                        child: ListView.builder(
-                          itemCount: state.recipes.length,
-                          itemBuilder: (context, index) {
-                            final recipe = state.recipes[index];
-                            return Card(
-                              margin: const EdgeInsetsDirectional.symmetric(
-                                horizontal: 16,
-                                vertical: 8,
-                              ),
-                              child: ListTile(
-                                onTap: () {
-                                  context.push('/detail/${recipe.id}');
-                                },
-                                leading: ClipRRect(
-                                  borderRadius: BorderRadius.circular(8),
-                                  child: Image.network(
-                                    recipe.image,
-                                    width: 60,
-                                    height: 60,
-                                    fit: BoxFit.cover,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                          child: ListView.builder(
+                            itemCount: state.recipes.length,
+                            itemBuilder: (context, index) {
+                              final recipe = state.recipes[index];
+                              return Card(
+                                color: Colors.white,
+                                shadowColor: Colors.grey,
+                                margin: const EdgeInsetsDirectional.symmetric(
+                                  horizontal: 2,
+                                  vertical: 4,
+                                ),
+                                child: ListTile(
+                                  onTap: () {
+                                    context.push('/detail/${recipe.id}');
+                                  },
+                                  leading: ClipRRect(
+                                    borderRadius: BorderRadius.circular(8),
+                                    child: Image.network(
+                                      recipe.image,
+                                      width: 60,
+                                      height: 60,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                  title: Text(recipe.title),
+                                  subtitle: state.selectedCategory == 'All'
+                                      ? Text(recipe.category)
+                                      : null,
+                                  trailing: IconButton(
+                                    onPressed: () {},
+                                    icon: Icon(Icons.bookmark_border),
                                   ),
                                 ),
-                                title: Text(recipe.title),
-                                subtitle: state.selectedCategory == 'All'
-                                    ? Text(recipe.category)
-                                    : null,
-                              ),
-                            );
-                          },
+                              );
+                            },
+                          ),
                         ),
                       ),
                     ],
