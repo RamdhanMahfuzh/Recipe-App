@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class OfflineRecipeWidget extends StatelessWidget {
-  const OfflineRecipeWidget({super.key});
+  final VoidCallback onBookmarkTap;
+
+  const OfflineRecipeWidget({super.key, required this.onBookmarkTap});
 
   @override
   Widget build(BuildContext context) {
@@ -47,10 +49,7 @@ class OfflineRecipeWidget extends StatelessWidget {
             width: MediaQuery.of(context).size.width * 0.6,
             height: MediaQuery.of(context).size.height * 0.058,
             child: ElevatedButton.icon(
-              onPressed: () {
-                // nanti arahkan ke bookmark/saved page
-                // context.push('/saved');
-              },
+              onPressed: onBookmarkTap,
 
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.orange,

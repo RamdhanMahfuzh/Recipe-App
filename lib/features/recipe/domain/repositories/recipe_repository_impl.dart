@@ -1,6 +1,6 @@
 import 'package:recipe_app/features/recipe/data/datasources/recipe_remote_datasource.dart';
 import 'package:recipe_app/features/recipe/domain/entities/recipe_entity.dart';
-import 'package:recipe_app/features/recipe/domain/repositories/recipe_repository.dart';
+import 'package:recipe_app/features/recipe/data/repositories/recipe_repository.dart';
 
 class RecipeRepositoryImpl implements RecipeRepository {
   final RecipeRemoteDatasource remoteDatasource;

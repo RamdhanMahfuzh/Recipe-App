@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 
-import 'package:recipe_app/features/recipe/presentation/bloc/recipe_bloc.dart';
+import 'package:recipe_app/features/recipe/presentation/bloc/recipe_bloc/recipe_bloc.dart';
 
 class EmptyRecipeWidget extends StatelessWidget {
   const EmptyRecipeWidget({super.key});

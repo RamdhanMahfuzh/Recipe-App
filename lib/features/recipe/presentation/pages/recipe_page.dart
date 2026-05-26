@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:recipe_app/features/recipe/presentation/bloc/recipe_random_bloc.dart';
+import 'package:recipe_app/features/recipe/presentation/bloc/recipe_random_bloc/recipe_random_bloc.dart';
 import 'package:recipe_app/injection.dart';
-import 'package:recipe_app/features/recipe/presentation/bloc/recipe_bloc.dart';
+import 'package:recipe_app/features/recipe/presentation/bloc/recipe_bloc/recipe_bloc.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:recipe_app/features/recipe/presentation/widgets/empty_recipe_widget.dart';
 import 'package:recipe_app/features/recipe/presentation/widgets/offline_recipe_widget.dart';
@@ -140,8 +140,10 @@ class RecipePage extends StatelessWidget {
           backgroundColor: Colors.orange,
           actions: [
             IconButton(
-              onPressed: () {},
-              icon: const Icon(Icons.bookmark, color: Colors.white),
+              onPressed: () {
+                context.push('/bookmark');
+              },
+              icon: const Icon(Icons.bookmark),
             ),
           ],
         ),
@@ -154,7 +156,11 @@ class RecipePage extends StatelessWidget {
             final isOffline =
                 result.isNotEmpty && result.first == ConnectivityResult.none;
             if (isOffline) {
-              return const OfflineRecipeWidget();
+              return OfflineRecipeWidget(
+                onBookmarkTap: () {
+                  context.push('/bookmark');
+                },
+              );
             }
             return BlocBuilder<RecipeBloc, RecipeState>(
               builder: (context, state) {
@@ -400,7 +406,11 @@ class RecipePage extends StatelessWidget {
                 }
                 if (state is RecipeError) {
                   if (state.message.contains('offline')) {
-                    return const OfflineRecipeWidget();
+                    return OfflineRecipeWidget(
+                      onBookmarkTap: () {
+                        context.push('/bookmark');
+                      },
+                    );
                   }
 
                   return Center(child: Text(state.message));

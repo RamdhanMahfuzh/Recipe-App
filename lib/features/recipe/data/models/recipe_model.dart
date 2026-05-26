@@ -36,3 +36,16 @@ class RecipeModel extends RecipeEntity {
     );
   }
 }
+
+extension RecipeModelMapper on RecipeModel {
+  RecipeEntity toEntity() {
+    return RecipeEntity(
+      id: id,
+      title: title,
+      image: image,
+      category: category,
+      instructions: instructions,
+      ingredients: ingredients,
+    );
+  }
+}

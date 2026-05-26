@@ -1,5 +1,5 @@
 import 'package:recipe_app/features/recipe/domain/entities/recipe_entity.dart';
-import 'package:recipe_app/features/recipe/domain/repositories/recipe_repository.dart';
+import 'package:recipe_app/features/recipe/data/repositories/recipe_repository.dart';
 
 class GetRecipeByCategory {
   final RecipeRepository repository;
