@@ -27,34 +27,8 @@ import 'package:recipe_app/features/recipe/presentation/bloc/bookmark_bloc/bookm
 final sl = GetIt.instance;
 
 Future<void> init() async {
-  // Hive Box
-  sl.registerLazySingleton<Box<RecipeModel>>(
-    () => Hive.box<RecipeModel>('bookmarks'),
-  );
-
-  // Bloc
-  sl.registerFactory(() => RecipeBloc(sl(), sl()));
-  sl.registerFactory(() => RecipeDetailBloc(sl()));
-  sl.registerFactory(() => RandomRecipeBloc(sl()));
-  sl.registerFactory(() => BookmarkBloc(sl(), sl()));
-  // Usecase
-  sl.registerLazySingleton(() => GetRecipes(sl()));
-  sl.registerLazySingleton(() => GetRecipeByCategory(sl()));
-  sl.registerLazySingleton(() => GetRecipeDetail(sl()));
-  sl.registerLazySingleton(() => GetRandomRecipe(sl()));
-  sl.registerLazySingleton(() => GetBookmarks(sl()));
-  sl.registerLazySingleton(() => ToggleBookmark(sl()));
-  sl.registerLazySingleton(() => IsBookmarked(sl()));
-
-  // Repository
-  sl.registerLazySingleton<RecipeRepository>(() => RecipeRepositoryImpl(sl()));
-  sl.registerLazySingleton<RecipeBookmarkRepository>(
-    () => RecipeBookmarkRepositoryImpl(sl()),
-  );
-  sl.registerLazySingleton<BookmarkRepository>(
-    () => BookmarkRepositoryImpl(sl()),
-  );
-
+  // Dio
+  sl.registerLazySingleton(() => Dio());
   //  Datasource
   sl.registerLazySingleton<RecipeRemoteDatasource>(
     () => RecipeRemoteDatasourceimpl(sl()),
@@ -65,10 +39,35 @@ Future<void> init() async {
   sl.registerLazySingleton<BookmarkLocalDatasource>(
     () => BookmarkLocalDatasourceImpl(sl()),
   );
-  // Dio
-  sl.registerLazySingleton(() => Dio());
-  // hive
+
+  // Repository
+  sl.registerLazySingleton<RecipeRepository>(() => RecipeRepositoryImpl(sl()));
+  sl.registerLazySingleton<RecipeBookmarkRepository>(
+    () => RecipeBookmarkRepositoryImpl(sl()),
+  );
+  sl.registerLazySingleton<BookmarkRepository>(
+    () => BookmarkRepositoryImpl(sl()),
+  );
+
+  // Hive Box
+  sl.registerLazySingleton<Box<RecipeModel>>(
+    () => Hive.box<RecipeModel>('bookmarks'),
+  );
   sl.registerLazySingleton<Box<RecipeBookmarkModel>>(
     () => Hive.box<RecipeBookmarkModel>('bookmarks'),
   );
+  // Usecase
+  sl.registerLazySingleton(() => GetRecipes(sl()));
+  sl.registerLazySingleton(() => GetRecipeByCategory(sl()));
+  sl.registerLazySingleton(() => GetRecipeDetail(sl()));
+  sl.registerLazySingleton(() => GetRandomRecipe(sl()));
+  sl.registerLazySingleton(() => GetBookmarks(sl()));
+  sl.registerLazySingleton(() => ToggleBookmark(sl()));
+  sl.registerLazySingleton(() => IsBookmarked(sl()));
+
+  // Bloc
+  sl.registerFactory(() => RecipeBloc(sl(), sl()));
+  sl.registerFactory(() => RecipeDetailBloc(sl()));
+  sl.registerFactory(() => RandomRecipeBloc(sl()));
+  sl.registerFactory(() => BookmarkBloc(sl(), sl()));
 }
