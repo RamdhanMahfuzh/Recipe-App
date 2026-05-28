@@ -143,7 +143,7 @@ class RecipePage extends StatelessWidget {
               onPressed: () {
                 context.push('/bookmark');
               },
-              icon: const Icon(Icons.bookmark),
+              icon: const Icon(Icons.bookmark, color: Colors.white),
             ),
           ],
         ),
