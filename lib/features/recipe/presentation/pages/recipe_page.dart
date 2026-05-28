@@ -148,12 +148,9 @@ class RecipePage extends StatelessWidget {
           ],
         ),
         // ========================= Body =========================
-        body: FutureBuilder<List<ConnectivityResult>>(
-          future: Connectivity().checkConnectivity(),
+        body: StreamBuilder<List<ConnectivityResult>>(
+          stream: Connectivity().onConnectivityChanged,
           builder: (context, snapshot) {
-            if (!snapshot.hasData) {
-              return const Center(child: CircularProgressIndicator());
-            }
             final result = snapshot.data ?? [];
 
             final isOffline =
