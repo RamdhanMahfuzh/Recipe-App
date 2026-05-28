@@ -11,82 +11,91 @@ class BookmarkPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (_) => sl<BookmarkBloc>()..add(OnGetBookmarks()),
-      child: Builder(
-        builder: (context) {
-          return Scaffold(
-            appBar: AppBar(
-              title: const Text(
-                "Bookmarks",
-                style: TextStyle(color: Colors.white),
+
+      child: BlocBuilder<BookmarkBloc, BookmarkState>(
+        builder: (context, state) {
+          if (state is BookmarkLoading) {
+            return const Scaffold(
+              body: Center(child: CircularProgressIndicator()),
+            );
+          }
+
+          if (state is BookmarkLoaded) {
+            final isEmpty = state.bookmarks.isEmpty;
+
+            return Scaffold(
+              appBar: AppBar(
+                title: const Text(
+                  "Bookmarks",
+                  style: TextStyle(color: Colors.white),
+                ),
+
+                backgroundColor: Colors.orange,
+
+                actions: [
+                  IconButton(
+                    onPressed: isEmpty
+                        ? null
+                        : () {
+                            context.read<BookmarkBloc>().add(
+                              OnSelectAllBookmarks(),
+                            );
+                          },
+
+                    icon: const Icon(Icons.select_all),
+                  ),
+
+                  IconButton(
+                    onPressed: isEmpty
+                        ? null
+                        : () {
+                            showDialog(
+                              context: context,
+
+                              builder: (_) {
+                                return AlertDialog(
+                                  title: const Text("Delete Selected"),
+
+                                  content: const Text(
+                                    "Delete selected bookmarks?",
+                                  ),
+
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                      },
+
+                                      child: const Text("Cancel"),
+                                    ),
+
+                                    ElevatedButton(
+                                      onPressed: () {
+                                        context.read<BookmarkBloc>().add(
+                                          OnDeleteSelectedBookmarks(),
+                                        );
+
+                                        Navigator.pop(context);
+                                      },
+
+                                      child: const Text("Delete"),
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                          },
+
+                    icon: const Icon(Icons.delete),
+                  ),
+                ],
               ),
 
-              backgroundColor: Colors.orange,
-
-              actions: [
-                IconButton(
-                  onPressed: () {
-                    final rootContext = context;
-                    rootContext.read<BookmarkBloc>().add(
-                      OnSelectAllBookmarks(),
-                    );
-                  },
-
-                  icon: const Icon(Icons.select_all),
-                ),
-
-                IconButton(
-                  onPressed: () {
-                    showDialog(
-                      context: context,
-
-                      builder: (_) {
-                        return AlertDialog(
-                          title: const Text("Delete Selected"),
-
-                          content: const Text("Delete selected bookmarks?"),
-
-                          actions: [
-                            TextButton(
-                              onPressed: () {
-                                Navigator.pop(context);
-                              },
-
-                              child: const Text("Cancel"),
-                            ),
-
-                            ElevatedButton(
-                              onPressed: () {
-                                context.read<BookmarkBloc>().add(
-                                  OnDeleteSelectedBookmarks(),
-                                );
-
-                                Navigator.pop(context);
-                              },
-
-                              child: const Text("Delete"),
-                            ),
-                          ],
-                        );
-                      },
-                    );
-                  },
-
-                  icon: const Icon(Icons.delete),
-                ),
-              ],
-            ),
-
-            body: BlocBuilder<BookmarkBloc, BookmarkState>(
-              builder: (context, state) {
-                if (state is BookmarkLoading) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-
-                if (state is BookmarkLoaded) {
-                  if (state.bookmarks.isEmpty) {
-                    return const Center(
+              body: isEmpty
+                  ? const Center(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
+
                         children: [
                           Icon(
                             Icons.bookmark_border,
@@ -97,129 +106,127 @@ class BookmarkPage extends StatelessWidget {
                           SizedBox(height: 12),
 
                           Text(
-                            "No Recipe Save",
+                            "No Recipe Saved",
                             style: TextStyle(fontSize: 18),
                           ),
                         ],
                       ),
-                    );
-                  }
+                    )
+                  : ListView.builder(
+                      padding: const EdgeInsets.all(16),
 
-                  return ListView.builder(
-                    padding: const EdgeInsets.all(16),
-                    itemCount: state.bookmarks.length,
+                      itemCount: state.bookmarks.length,
 
-                    itemBuilder: (context, index) {
-                      final recipe = state.bookmarks[index];
+                      itemBuilder: (context, index) {
+                        final recipe = state.bookmarks[index];
 
-                      return Card(
-                        margin: const EdgeInsets.only(bottom: 12),
+                        return Card(
+                          margin: const EdgeInsets.only(bottom: 12),
 
-                        child: ListTile(
-                          onTap: () {
-                            // context.push('/detail/${recipe.id}');
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => DetailPage(recipe: recipe),
-                              ),
-                            );
-                          },
+                          child: ListTile(
+                            onTap: () {
+                              Navigator.push(
+                                context,
 
-                          contentPadding: const EdgeInsets.all(10),
-
-                          leading: Checkbox(
-                            value: state.selectedIds.contains(recipe.id),
-
-                            onChanged: (_) {
-                              context.read<BookmarkBloc>().add(
-                                OnToggleSelectBookmark(recipe.id),
+                                MaterialPageRoute(
+                                  builder: (_) => DetailPage(recipe: recipe),
+                                ),
                               );
                             },
-                          ),
 
-                          title: Row(
-                            children: [
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(8),
+                            contentPadding: const EdgeInsets.all(10),
 
-                                child: Image.network(
-                                  recipe.image,
-                                  width: 60,
-                                  height: 60,
-                                  fit: BoxFit.cover,
+                            leading: Checkbox(
+                              value: state.selectedIds.contains(recipe.id),
+
+                              onChanged: (_) {
+                                context.read<BookmarkBloc>().add(
+                                  OnToggleSelectBookmark(recipe.id),
+                                );
+                              },
+                            ),
+
+                            title: Row(
+                              children: [
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(8),
+
+                                  child: Image.network(
+                                    recipe.image,
+                                    width: 60,
+                                    height: 60,
+                                    fit: BoxFit.cover,
+                                  ),
                                 ),
-                              ),
 
-                              const SizedBox(width: 12),
+                                const SizedBox(width: 12),
 
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
 
-                                  children: [
-                                    Text(
-                                      recipe.title,
-                                      maxLines: 2,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-
-                                    Text(recipe.category),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-
-                          // subtitle: Text(recipe.category),
-                          trailing: IconButton(
-                            onPressed: () {
-                              showDialog(
-                                context: context,
-                                builder: (dialogContext) {
-                                  return AlertDialog(
-                                    title: const Text("Remove Bookmark"),
-
-                                    content: Text("Remove ${recipe.title} ?"),
-
-                                    actions: [
-                                      TextButton(
-                                        onPressed: () {
-                                          Navigator.pop(dialogContext);
-                                        },
-
-                                        child: const Text("Cancel"),
+                                    children: [
+                                      Text(
+                                        recipe.title,
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
                                       ),
 
-                                      ElevatedButton(
-                                        onPressed: () {
-                                          context.read<BookmarkBloc>().add(
-                                            OnToggleBookmark(recipe),
-                                          );
-
-                                          Navigator.pop(dialogContext);
-                                        },
-
-                                        child: const Text("Remove"),
-                                      ),
+                                      Text(recipe.category),
                                     ],
-                                  );
-                                },
-                              );
-                            },
+                                  ),
+                                ),
+                              ],
+                            ),
 
-                            icon: const Icon(Icons.close, color: Colors.red),
+                            trailing: IconButton(
+                              onPressed: () {
+                                showDialog(
+                                  context: context,
+
+                                  builder: (dialogContext) {
+                                    return AlertDialog(
+                                      title: const Text("Remove Bookmark"),
+
+                                      content: Text("Remove ${recipe.title} ?"),
+
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () {
+                                            Navigator.pop(dialogContext);
+                                          },
+
+                                          child: const Text("Cancel"),
+                                        ),
+
+                                        ElevatedButton(
+                                          onPressed: () {
+                                            context.read<BookmarkBloc>().add(
+                                              OnToggleBookmark(recipe),
+                                            );
+
+                                            Navigator.pop(dialogContext);
+                                          },
+
+                                          child: const Text("Remove"),
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                );
+                              },
+
+                              icon: const Icon(Icons.close, color: Colors.red),
+                            ),
                           ),
-                        ),
-                      );
-                    },
-                  );
-                }
+                        );
+                      },
+                    ),
+            );
+          }
 
-                return const SizedBox();
-              },
-            ),
-          );
+          return const SizedBox();
         },
       ),
     );
