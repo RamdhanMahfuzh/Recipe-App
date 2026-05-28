@@ -8,9 +8,10 @@ import 'package:recipe_app/features/recipe/presentation/bloc/recipe_detail_bloc/
 import 'package:shimmer/shimmer.dart';
 
 class DetailPage extends StatelessWidget {
-  final String id;
+  final String? id;
+  final RecipeEntity? recipe;
 
-  const DetailPage({super.key, required this.id});
+  const DetailPage({super.key, this.id, this.recipe});
 
   // ================= SHIMMER HELPERS =================
 
@@ -32,16 +33,19 @@ class DetailPage extends StatelessWidget {
   Widget _shimmerDetail() {
     return CustomScrollView(
       slivers: [
-        // IMAGE SHIMMER (SliverAppBar replacement)
         SliverAppBar(
           expandedHeight: 280,
           pinned: true,
           backgroundColor: Colors.transparent,
+
           leading: const BackButton(color: Colors.white),
+
           flexibleSpace: FlexibleSpaceBar(
             background: Shimmer.fromColors(
               baseColor: Colors.grey.shade300,
+
               highlightColor: Colors.grey.shade100,
+
               child: Container(color: Colors.white),
             ),
           ),
@@ -50,8 +54,10 @@ class DetailPage extends StatelessWidget {
         SliverToBoxAdapter(
           child: Padding(
             padding: const EdgeInsets.all(16),
+
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+
               children: [
                 _shimmerBox(height: 28, width: 200),
 
@@ -69,16 +75,18 @@ class DetailPage extends StatelessWidget {
 
                 const SizedBox(height: 12),
 
-                // ingredients shimmer
                 Column(
                   children: List.generate(
                     5,
                     (index) => Padding(
                       padding: const EdgeInsets.only(bottom: 10),
+
                       child: Row(
                         children: [
                           _shimmerBox(width: 8, height: 8),
+
                           const SizedBox(width: 10),
+
                           Expanded(child: _shimmerBox(height: 12)),
                         ],
                       ),
@@ -95,6 +103,7 @@ class DetailPage extends StatelessWidget {
                 _shimmerBox(
                   height: 180,
                   width: double.infinity,
+
                   radius: BorderRadius.circular(12),
                 ),
 
@@ -107,215 +116,251 @@ class DetailPage extends StatelessWidget {
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return MultiBlocProvider(
-      providers: [
-        BlocProvider(
-          create: (_) => sl<RecipeDetailBloc>()..add(OnGetRecipeDetail(id)),
-        ),
-        BlocProvider(create: (_) => sl<BookmarkBloc>()..add(OnGetBookmarks())),
-      ],
+  // ================= DETAIL UI =================
 
-      child: BlocListener<BookmarkBloc, BookmarkState>(
-        listener: (context, state) {
-          if (state is BookmarkActionSuccess) {
-            ScaffoldMessenger.of(context)
-              ..hideCurrentSnackBar()
-              ..showSnackBar(
-                SnackBar(
-                  backgroundColor: state.isAdded ? Colors.green : Colors.black,
+  Widget _buildDetailContent(BuildContext context, RecipeEntity recipe) {
+    return BlocListener<BookmarkBloc, BookmarkState>(
+      listener: (context, state) {
+        if (state is BookmarkActionSuccess) {
+          ScaffoldMessenger.of(context)
+            ..hideCurrentSnackBar()
+            ..showSnackBar(
+              SnackBar(
+                backgroundColor: state.isAdded ? Colors.green : Colors.black,
 
-                  duration: const Duration(seconds: 2),
+                duration: const Duration(seconds: 2),
 
-                  content: Row(
-                    children: [
-                      Icon(
-                        state.isAdded ? Icons.check_circle : Icons.delete,
-                        color: Colors.white,
-                      ),
+                content: Row(
+                  children: [
+                    Icon(
+                      state.isAdded ? Icons.check_circle : Icons.delete,
 
-                      const SizedBox(width: 10),
-
-                      Expanded(
-                        child: Text(
-                          state.isAdded
-                              ? "Recipe successfully bookmarked"
-                              : "Recipe removed from bookmarks",
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-          }
-        },
-        child: Scaffold(
-          body: BlocBuilder<RecipeDetailBloc, RecipeDetailState>(
-            builder: (context, state) {
-              // ================= LOADING =================
-              if (state is RecipeDetailLoading) {
-                return _shimmerDetail();
-              }
-
-              // ================= LOADED =================
-              if (state is RecipeDetailLoaded) {
-                final recipe = state.recipe;
-
-                return CustomScrollView(
-                  slivers: [
-                    SliverAppBar(
-                      expandedHeight: 280,
-                      pinned: true,
-                      backgroundColor: Colors.transparent,
-
-                      leading: IconButton(
-                        onPressed: () {
-                          context.pop();
-                        },
-                        icon: const Icon(Icons.arrow_back, color: Colors.white),
-                      ),
-
-                      flexibleSpace: FlexibleSpaceBar(
-                        background: Image.network(
-                          recipe.image,
-                          fit: BoxFit.cover,
-                        ),
-                      ),
+                      color: Colors.white,
                     ),
 
-                    SliverToBoxAdapter(
-                      child: Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Expanded(
-                                  child: Text(
-                                    recipe.title,
-                                    style: const TextStyle(
-                                      fontSize: 28,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
+                    const SizedBox(width: 10),
 
-                                BlocBuilder<BookmarkBloc, BookmarkState>(
-                                  builder: (context, state) {
-                                    final bookmarks = state is BookmarkLoaded
-                                        ? state.bookmarks
-                                        : <RecipeEntity>[];
-
-                                    final isBookmarked = bookmarks.any(
-                                      (e) => e.id == recipe.id,
-                                    );
-
-                                    return IconButton(
-                                      onPressed: () {
-                                        context.read<BookmarkBloc>().add(
-                                          OnToggleBookmark(recipe),
-                                        );
-                                      },
-
-                                      icon: Icon(
-                                        isBookmarked
-                                            ? Icons.bookmark
-                                            : Icons.bookmark_border,
-
-                                        color: isBookmarked
-                                            ? Colors.orange
-                                            : Colors.black,
-                                      ),
-                                    );
-                                  },
-                                ),
-                              ],
-                            ),
-
-                            const SizedBox(height: 14),
-
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 14,
-                                vertical: 8,
-                              ),
-                              decoration: BoxDecoration(
-                                color: Colors.orange,
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              child: Text(
-                                recipe.category,
-                                style: const TextStyle(color: Colors.white),
-                              ),
-                            ),
-
-                            const SizedBox(height: 24),
-
-                            const Text(
-                              "Ingredients",
-                              style: TextStyle(
-                                fontSize: 22,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-
-                            const SizedBox(height: 12),
-
-                            ...recipe.ingredients.map((ingredient) {
-                              return Padding(
-                                padding: const EdgeInsets.only(bottom: 10),
-                                child: Row(
-                                  children: [
-                                    const Icon(Icons.circle, size: 8),
-                                    const SizedBox(width: 10),
-                                    Expanded(child: Text(ingredient)),
-                                  ],
-                                ),
-                              );
-                            }),
-
-                            const SizedBox(height: 30),
-
-                            const Text(
-                              "Instructions",
-                              style: TextStyle(
-                                fontSize: 22,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-
-                            const SizedBox(height: 12),
-
-                            Container(
-                              padding: const EdgeInsets.all(16),
-                              decoration: BoxDecoration(
-                                color: Colors.grey.shade100,
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: Text(
-                                recipe.instructions,
-                                style: const TextStyle(
-                                  height: 1.7,
-                                  fontSize: 16,
-                                ),
-                              ),
-                            ),
-
-                            const SizedBox(height: 40),
-                          ],
-                        ),
+                    Expanded(
+                      child: Text(
+                        state.isAdded
+                            ? "Recipe successfully bookmarked"
+                            : "Recipe removed from bookmarks",
                       ),
                     ),
                   ],
-                );
-              }
+                ),
+              ),
+            );
+        }
+      },
 
-              return const SizedBox();
-            },
+      child: Scaffold(
+        body: CustomScrollView(
+          slivers: [
+            SliverAppBar(
+              expandedHeight: 280,
+              pinned: true,
+
+              backgroundColor: Colors.transparent,
+
+              leading: IconButton(
+                onPressed: () {
+                  context.pop();
+                },
+
+                icon: const Icon(Icons.arrow_back, color: Colors.white),
+              ),
+
+              flexibleSpace: FlexibleSpaceBar(
+                background: Image.network(recipe.image, fit: BoxFit.cover),
+              ),
+            ),
+
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+
+                  children: [
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+
+                      children: [
+                        Expanded(
+                          child: Text(
+                            recipe.title,
+
+                            style: const TextStyle(
+                              fontSize: 28,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+
+                        BlocBuilder<BookmarkBloc, BookmarkState>(
+                          builder: (context, state) {
+                            final bookmarks = state is BookmarkLoaded
+                                ? state.bookmarks
+                                : <RecipeEntity>[];
+
+                            final isBookmarked = bookmarks.any(
+                              (e) => e.id == recipe.id,
+                            );
+
+                            return IconButton(
+                              onPressed: () {
+                                context.read<BookmarkBloc>().add(
+                                  OnToggleBookmark(recipe),
+                                );
+                              },
+
+                              icon: Icon(
+                                isBookmarked
+                                    ? Icons.bookmark
+                                    : Icons.bookmark_border,
+
+                                color: isBookmarked
+                                    ? Colors.orange
+                                    : Colors.black,
+                              ),
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 14),
+
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 8,
+                      ),
+
+                      decoration: BoxDecoration(
+                        color: Colors.orange,
+
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+
+                      child: Text(
+                        recipe.category,
+
+                        style: const TextStyle(color: Colors.white),
+                      ),
+                    ),
+
+                    const SizedBox(height: 24),
+
+                    const Text(
+                      "Ingredients",
+
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+
+                    const SizedBox(height: 12),
+
+                    ...recipe.ingredients.map((ingredient) {
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 10),
+
+                        child: Row(
+                          children: [
+                            const Icon(Icons.circle, size: 8),
+
+                            const SizedBox(width: 10),
+
+                            Expanded(child: Text(ingredient)),
+                          ],
+                        ),
+                      );
+                    }),
+
+                    const SizedBox(height: 30),
+
+                    const Text(
+                      "Instructions",
+
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+
+                    const SizedBox(height: 12),
+
+                    Container(
+                      padding: const EdgeInsets.all(16),
+
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade100,
+
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+
+                      child: Text(
+                        recipe.instructions,
+
+                        style: const TextStyle(height: 1.7, fontSize: 16),
+                      ),
+                    ),
+
+                    const SizedBox(height: 40),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // ================= OFFLINE MODE =================
+
+    if (recipe != null) {
+      return MultiBlocProvider(
+        providers: [
+          BlocProvider(
+            create: (_) => sl<BookmarkBloc>()..add(OnGetBookmarks()),
           ),
+        ],
+
+        child: _buildDetailContent(context, recipe!),
+      );
+    }
+
+    // ================= ONLINE MODE =================
+
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (_) => sl<RecipeDetailBloc>()..add(OnGetRecipeDetail(id!)),
+        ),
+
+        BlocProvider(create: (_) => sl<BookmarkBloc>()..add(OnGetBookmarks())),
+      ],
+
+      child: Scaffold(
+        body: BlocBuilder<RecipeDetailBloc, RecipeDetailState>(
+          builder: (context, state) {
+            if (state is RecipeDetailLoading) {
+              return _shimmerDetail();
+            }
+
+            if (state is RecipeDetailLoaded) {
+              return _buildDetailContent(context, state.recipe);
+            }
+
+            return const SizedBox();
+          },
         ),
       ),
     );

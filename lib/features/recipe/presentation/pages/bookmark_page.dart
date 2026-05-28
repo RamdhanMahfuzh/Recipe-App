@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
 import 'package:recipe_app/features/recipe/presentation/bloc/bookmark_bloc/bookmark_bloc.dart';
+import 'package:recipe_app/features/recipe/presentation/pages/detail_page.dart';
 import 'package:recipe_app/injection.dart';
 
 class BookmarkPage extends StatelessWidget {
@@ -117,7 +117,13 @@ class BookmarkPage extends StatelessWidget {
 
                         child: ListTile(
                           onTap: () {
-                            context.push('/detail/${recipe.id}');
+                            // context.push('/detail/${recipe.id}');
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => DetailPage(recipe: recipe),
+                              ),
+                            );
                           },
 
                           contentPadding: const EdgeInsets.all(10),
