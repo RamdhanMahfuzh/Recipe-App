@@ -22,7 +22,7 @@ class BookmarkPage extends StatelessWidget {
 
           if (state is BookmarkLoaded) {
             final isEmpty = state.bookmarks.isEmpty;
-
+            final isNoSelection = state.selectedIds.isEmpty;
             return Scaffold(
               appBar: AppBar(
                 title: const Text(
@@ -46,12 +46,11 @@ class BookmarkPage extends StatelessWidget {
                   ),
 
                   IconButton(
-                    onPressed: isEmpty
+                    onPressed: isEmpty || isNoSelection
                         ? null
                         : () {
                             showDialog(
                               context: context,
-
                               builder: (_) {
                                 return AlertDialog(
                                   title: const Text("Delete Selected"),

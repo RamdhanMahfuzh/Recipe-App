@@ -160,6 +160,10 @@ class RecipePage extends StatelessWidget {
                 onBookmarkTap: () {
                   context.push('/bookmark');
                 },
+
+                onRetry: () {
+                  context.read<RecipeBloc>().add(OnGetRecipes(''));
+                },
               );
             }
             return BlocBuilder<RecipeBloc, RecipeState>(
@@ -409,6 +413,10 @@ class RecipePage extends StatelessWidget {
                     return OfflineRecipeWidget(
                       onBookmarkTap: () {
                         context.push('/bookmark');
+                      },
+
+                      onRetry: () {
+                        context.read<RecipeBloc>().add(OnGetRecipes(''));
                       },
                     );
                   }
