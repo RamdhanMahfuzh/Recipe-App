@@ -321,7 +321,7 @@ class RecipePage extends StatelessWidget {
                                         begin: Alignment.bottomCenter,
                                         end: Alignment.topCenter,
                                         colors: [
-                                          Colors.black.withOpacity(0.8),
+                                          Colors.black.withValues(alpha: 0.8),
                                           Colors.transparent,
                                         ],
                                       ),
@@ -345,8 +345,8 @@ class RecipePage extends StatelessWidget {
                                         Text(
                                           recipe.category,
                                           style: TextStyle(
-                                            color: Colors.white.withOpacity(
-                                              0.8,
+                                            color: Colors.white.withValues(
+                                              alpha: 0.8,
                                             ),
                                             fontSize: 12,
                                           ),

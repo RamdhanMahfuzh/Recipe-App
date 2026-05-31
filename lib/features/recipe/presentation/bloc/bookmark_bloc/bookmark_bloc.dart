@@ -1,4 +1,3 @@
-import 'package:bloc/bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:recipe_app/features/recipe/data/models/recipe_bookmark_model.dart';
 import 'package:recipe_app/features/recipe/domain/entities/recipe_entity.dart';
@@ -54,19 +53,14 @@ class BookmarkBloc extends Bloc<BookmarkEvent, BookmarkState> {
     OnToggleBookmark event,
     Emitter<BookmarkState> emit,
   ) async {
-    print("TOGGLE: ${event.recipe.title}");
+   
     final oldBookmarks = await getBookmarks();
 
     final isExist = oldBookmarks.any((e) => e.id == event.recipe.id);
 
     await toggleBookmark(RecipeBookmarkModel.fromEntity(event.recipe));
 
-    final data = await getBookmarks();
-
-    print("TOTAL BOOKMARK: ${data.length}");
-    for (var item in data) {
-      print(item.title);
-    }
+   
     emit(BookmarkActionSuccess(!isExist));
 
     add(OnGetBookmarks());

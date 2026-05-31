@@ -1,4 +1,4 @@
-import 'package:bloc/bloc.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:recipe_app/features/recipe/domain/entities/recipe_entity.dart';
 import 'package:recipe_app/features/recipe/domain/usecases/recipes/get_recipes.dart';
