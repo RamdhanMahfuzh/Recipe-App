@@ -216,9 +216,24 @@ class RecipePage extends StatelessWidget {
                           },
                         ),
                       ),
-
+                      // Category Title
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            "Category",
+                            style: TextStyle(
+                              fontSize:
+                                  MediaQuery.of(context).size.width * 0.045,
+                              fontWeight: FontWeight.w400,
+                              color: Colors.black87,
+                            ),
+                          ),
+                        ),
+                      ),
                       // Category
-                      const SizedBox(height: 12),
+                      const SizedBox(height: 10),
                       SizedBox(
                         height: 50,
                         child: ListView(
@@ -283,7 +298,44 @@ class RecipePage extends StatelessWidget {
                           ],
                         ),
                       ),
+                      // Random Recipe Title
+                      Padding(
+                        padding: const EdgeInsets.only(
+                          left: 16,
+                          right: 16,
+                          top: 16,
+                          bottom: 2,
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "Random Recipe",
+                              style: TextStyle(
+                                fontSize:
+                                    MediaQuery.of(context).size.width * 0.045,
+                                fontWeight: FontWeight.w400,
+                                color: Colors.black87,
+                              ),
+                            ),
 
+                            IconButton(
+                              padding: EdgeInsets.zero,
+                              constraints: const BoxConstraints(),
+                              onPressed: () {
+                                context.read<RandomRecipeBloc>().add(
+                                  OnGetRandomRecipe(),
+                                );
+                              },
+                              icon: const Icon(
+                                Icons.casino_rounded,
+                                color: Colors.orange,
+                                size: 20,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                       // Random Recipe
                       BlocBuilder<RandomRecipeBloc, RandomRecipeState>(
                         builder: (context, state) {
