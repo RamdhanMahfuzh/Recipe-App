@@ -35,8 +35,8 @@ jobs:
       - name: Analyze Project
         run: flutter analyze
 
-      - name: Build APK Split ABI
-        run: flutter build apk --release --split-per-abi
+      - name: Build Universal APK
+        run: flutter build apk --release
 
       - name: Check APK Output
         run: ls -lah build/app/outputs/flutter-apk/
@@ -46,6 +46,6 @@ jobs:
         with:
           generate_release_notes: true
           files: |
-            build/app/outputs/flutter-apk/*.apk
+            build/app/outputs/flutter-apk/app-release.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
