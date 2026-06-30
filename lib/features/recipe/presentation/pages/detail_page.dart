@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:recipe_app/core/theme/app_theme.dart';
 import 'package:recipe_app/features/recipe/domain/entities/recipe_entity.dart';
 import 'package:recipe_app/features/recipe/presentation/bloc/bookmark_bloc/bookmark_bloc.dart';
 import 'package:recipe_app/injection.dart';
@@ -17,14 +18,14 @@ class DetailPage extends StatelessWidget {
 
   Widget _shimmerBox({double? width, double? height, BorderRadius? radius}) {
     return Shimmer.fromColors(
-      baseColor: Colors.grey.shade300,
-      highlightColor: Colors.grey.shade100,
+      baseColor: AppColors.surfaceAlt,
+      highlightColor: AppColors.background,
       child: Container(
         width: width,
         height: height,
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: radius ?? BorderRadius.circular(8),
+          color: AppColors.surface,
+          borderRadius: radius ?? BorderRadius.circular(AppRadius.sm),
         ),
       ),
     );
@@ -42,11 +43,11 @@ class DetailPage extends StatelessWidget {
 
           flexibleSpace: FlexibleSpaceBar(
             background: Shimmer.fromColors(
-              baseColor: Colors.grey.shade300,
+              baseColor: AppColors.surfaceAlt,
 
-              highlightColor: Colors.grey.shade100,
+              highlightColor: AppColors.background,
 
-              child: Container(color: Colors.white),
+              child: Container(color: AppColors.surface),
             ),
           ),
         ),
@@ -126,7 +127,9 @@ class DetailPage extends StatelessWidget {
             ..hideCurrentSnackBar()
             ..showSnackBar(
               SnackBar(
-                backgroundColor: state.isAdded ? Colors.green : Colors.black,
+                backgroundColor: state.isAdded
+                    ? AppColors.success
+                    : AppColors.textPrimary,
 
                 duration: const Duration(seconds: 2),
 
@@ -161,7 +164,7 @@ class DetailPage extends StatelessWidget {
               expandedHeight: 280,
               pinned: true,
 
-              backgroundColor: Colors.transparent,
+              backgroundColor: AppColors.primary,
 
               leading: IconButton(
                 onPressed: () {
@@ -178,7 +181,7 @@ class DetailPage extends StatelessWidget {
 
             SliverToBoxAdapter(
               child: Padding(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(AppSpacing.lg),
 
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -192,10 +195,7 @@ class DetailPage extends StatelessWidget {
                           child: Text(
                             recipe.title,
 
-                            style: const TextStyle(
-                              fontSize: 28,
-                              fontWeight: FontWeight.bold,
-                            ),
+                            style: Theme.of(context).textTheme.headlineLarge,
                           ),
                         ),
 
@@ -222,8 +222,8 @@ class DetailPage extends StatelessWidget {
                                     : Icons.bookmark_border,
 
                                 color: isBookmarked
-                                    ? Colors.orange
-                                    : Colors.black,
+                                    ? AppColors.primary
+                                    : AppColors.textSecondary,
                               ),
                             );
                           },
@@ -231,86 +231,100 @@ class DetailPage extends StatelessWidget {
                       ],
                     ),
 
-                    const SizedBox(height: 14),
+                    const SizedBox(height: AppSpacing.md),
 
                     Container(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 14,
-                        vertical: 8,
+                        horizontal: AppSpacing.md,
+                        vertical: AppSpacing.xs,
                       ),
 
                       decoration: BoxDecoration(
-                        color: Colors.orange,
+                        color: AppColors.primarySoft,
 
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius: BorderRadius.circular(AppRadius.pill),
                       ),
 
                       child: Text(
                         recipe.category,
 
-                        style: const TextStyle(color: Colors.white),
+                        style: const TextStyle(
+                          color: AppColors.primaryDark,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 13,
+                        ),
                       ),
                     ),
 
-                    const SizedBox(height: 24),
+                    const SizedBox(height: AppSpacing.xl),
 
-                    const Text(
+                    Text(
                       "Ingredients",
 
-                      style: TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      style: Theme.of(context).textTheme.headlineMedium,
                     ),
 
-                    const SizedBox(height: 12),
+                    const SizedBox(height: AppSpacing.md),
 
                     ...recipe.ingredients.map((ingredient) {
                       return Padding(
-                        padding: const EdgeInsets.only(bottom: 10),
+                        padding: const EdgeInsets.only(
+                          bottom: AppSpacing.sm,
+                        ),
 
                         child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Icon(Icons.circle, size: 8),
+                            Container(
+                              margin: const EdgeInsets.only(top: 6),
+                              width: 6,
+                              height: 6,
+                              decoration: const BoxDecoration(
+                                color: AppColors.primary,
+                                shape: BoxShape.circle,
+                              ),
+                            ),
 
-                            const SizedBox(width: 10),
+                            const SizedBox(width: AppSpacing.md),
 
-                            Expanded(child: Text(ingredient)),
+                            Expanded(
+                              child: Text(
+                                ingredient,
+                                style: Theme.of(context).textTheme.bodyLarge,
+                              ),
+                            ),
                           ],
                         ),
                       );
                     }),
 
-                    const SizedBox(height: 30),
+                    const SizedBox(height: AppSpacing.xl),
 
-                    const Text(
+                    Text(
                       "Instructions",
 
-                      style: TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      style: Theme.of(context).textTheme.headlineMedium,
                     ),
 
-                    const SizedBox(height: 12),
+                    const SizedBox(height: AppSpacing.md),
 
                     Container(
-                      padding: const EdgeInsets.all(16),
+                      padding: const EdgeInsets.all(AppSpacing.lg),
 
                       decoration: BoxDecoration(
-                        color: Colors.grey.shade100,
+                        color: AppColors.surfaceAlt,
 
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(AppRadius.lg),
                       ),
 
                       child: Text(
                         recipe.instructions,
 
-                        style: const TextStyle(height: 1.7, fontSize: 16),
+                        style: Theme.of(context).textTheme.bodyLarge,
                       ),
                     ),
 
-                    const SizedBox(height: 40),
+                    const SizedBox(height: AppSpacing.xxl),
                   ],
                 ),
               ),

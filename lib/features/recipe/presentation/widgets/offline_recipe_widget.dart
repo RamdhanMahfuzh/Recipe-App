@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:recipe_app/core/theme/app_theme.dart';
 
 class OfflineRecipeWidget extends StatelessWidget {
   final VoidCallback onBookmarkTap;
@@ -14,105 +15,70 @@ class OfflineRecipeWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          // IMAGE RESPONSIVE
-          SizedBox(
-            height: MediaQuery.of(context).size.height * 0.4,
-            child: SvgPicture.asset(
-              'assets/images/offline.svg',
-              fit: BoxFit.contain,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SizedBox(
+              height: MediaQuery.of(context).size.height * 0.32,
+              child: SvgPicture.asset(
+                'assets/images/offline.svg',
+                fit: BoxFit.contain,
+              ),
             ),
-          ),
 
-          const SizedBox(height: 20),
+            const SizedBox(height: AppSpacing.xl),
 
-          Text(
-            "You're in offline mode",
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: MediaQuery.of(context).size.width * 0.05,
-              fontWeight: FontWeight.bold,
+            Text(
+              "You're in offline mode",
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.headlineMedium,
             ),
-          ),
 
-          const SizedBox(height: 8),
+            const SizedBox(height: AppSpacing.xs),
 
-          Text(
-            "Try to connect internet",
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: Colors.grey.shade600,
-              fontSize: MediaQuery.of(context).size.width * 0.04,
+            Text(
+              "Connect to the internet to browse recipes",
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.bodyMedium,
             ),
-          ),
 
-          const SizedBox(height: 28),
+            const SizedBox(height: AppSpacing.xl),
 
-          SizedBox(
-            width: MediaQuery.of(context).size.width * 0.6,
-            height: MediaQuery.of(context).size.height * 0.058,
-            child: ElevatedButton.icon(
-              onPressed: onBookmarkTap,
+            SizedBox(
+              width: double.infinity,
+              height: 48,
+              child: ElevatedButton.icon(
+                onPressed: onBookmarkTap,
+                icon: const Icon(Icons.bookmark, size: 18),
+                label: const Text("Go to saved recipes"),
+              ),
+            ),
 
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.orange,
-                foregroundColor: Colors.white,
+            const SizedBox(height: AppSpacing.sm),
 
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+            SizedBox(
+              width: double.infinity,
+              height: 48,
+              child: OutlinedButton.icon(
+                onPressed: onRetry,
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: AppColors.textPrimary,
+                  side: const BorderSide(color: AppColors.border),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(AppRadius.md),
+                  ),
                 ),
-              ),
-
-              icon: Icon(
-                Icons.bookmark,
-                size: MediaQuery.of(context).size.width * 0.048,
-              ),
-
-              label: Text(
-                "Go to Saved Recipe",
-                style: TextStyle(
-                  fontSize: MediaQuery.of(context).size.width * 0.04,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(height: 14),
-
-          SizedBox(
-            width: MediaQuery.of(context).size.width * 0.6,
-            height: MediaQuery.of(context).size.height * 0.058,
-
-            child: ElevatedButton.icon(
-              onPressed: onRetry,
-
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.black,
-                foregroundColor: Colors.white,
-
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-
-              icon: Icon(
-                Icons.refresh,
-                size: MediaQuery.of(context).size.width * 0.048,
-              ),
-
-              label: Text(
-                "Try Again",
-                style: TextStyle(
-                  fontSize: MediaQuery.of(context).size.width * 0.04,
-
-                  fontWeight: FontWeight.w600,
+                icon: const Icon(Icons.refresh, size: 18),
+                label: const Text(
+                  "Try again",
+                  style: TextStyle(fontWeight: FontWeight.w600),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

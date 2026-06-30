@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:recipe_app/core/theme/app_theme.dart';
 import 'package:recipe_app/features/recipe/presentation/bloc/bookmark_bloc/bookmark_bloc.dart';
 import 'package:recipe_app/features/recipe/presentation/pages/detail_page.dart';
 import 'package:recipe_app/injection.dart';
@@ -25,12 +26,7 @@ class BookmarkPage extends StatelessWidget {
             final isNoSelection = state.selectedIds.isEmpty;
             return Scaffold(
               appBar: AppBar(
-                title: const Text(
-                  "Bookmarks",
-                  style: TextStyle(color: Colors.white),
-                ),
-
-                backgroundColor: Colors.orange,
+                title: const Text("Bookmarks"),
 
                 actions: [
                   IconButton(
@@ -69,6 +65,9 @@ class BookmarkPage extends StatelessWidget {
                                     ),
 
                                     ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: AppColors.danger,
+                                      ),
                                       onPressed: () {
                                         context.read<BookmarkBloc>().add(
                                           OnDeleteSelectedBookmarks(),
@@ -91,38 +90,51 @@ class BookmarkPage extends StatelessWidget {
               ),
 
               body: isEmpty
-                  ? const Center(
+                  ? Center(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
 
                         children: [
-                          Icon(
+                          const Icon(
                             Icons.bookmark_border,
-                            size: 80,
-                            color: Colors.grey,
+                            size: 72,
+                            color: AppColors.textMuted,
                           ),
 
-                          SizedBox(height: 12),
+                          const SizedBox(height: AppSpacing.md),
 
                           Text(
-                            "No Recipe Saved",
-                            style: TextStyle(fontSize: 18),
+                            "No recipe saved",
+                            style: Theme.of(context).textTheme.titleMedium,
+                          ),
+                          const SizedBox(height: AppSpacing.xs),
+                          Text(
+                            "Bookmarked recipes will appear here",
+                            style: Theme.of(context).textTheme.bodySmall,
                           ),
                         ],
                       ),
                     )
-                  : ListView.builder(
-                      padding: const EdgeInsets.all(16),
+                  : ListView.separated(
+                      padding: const EdgeInsets.all(AppSpacing.lg),
 
                       itemCount: state.bookmarks.length,
+                      separatorBuilder: (_, __) =>
+                          const SizedBox(height: AppSpacing.sm),
 
                       itemBuilder: (context, index) {
                         final recipe = state.bookmarks[index];
 
-                        return Card(
-                          margin: const EdgeInsets.only(bottom: 12),
-
-                          child: ListTile(
+                        return Container(
+                          padding: const EdgeInsets.all(AppSpacing.sm),
+                          decoration: BoxDecoration(
+                            color: AppColors.surface,
+                            borderRadius: BorderRadius.circular(
+                              AppRadius.md,
+                            ),
+                            border: Border.all(color: AppColors.border),
+                          ),
+                          child: InkWell(
                             onTap: () {
                               Navigator.push(
                                 context,
@@ -132,23 +144,26 @@ class BookmarkPage extends StatelessWidget {
                                 ),
                               );
                             },
-
-                            contentPadding: const EdgeInsets.all(10),
-
-                            leading: Checkbox(
-                              value: state.selectedIds.contains(recipe.id),
-
-                              onChanged: (_) {
-                                context.read<BookmarkBloc>().add(
-                                  OnToggleSelectBookmark(recipe.id),
-                                );
-                              },
+                            borderRadius: BorderRadius.circular(
+                              AppRadius.md,
                             ),
-
-                            title: Row(
+                            child: Row(
                               children: [
+                                Checkbox(
+                                  value: state.selectedIds.contains(
+                                    recipe.id,
+                                  ),
+
+                                  onChanged: (_) {
+                                    context.read<BookmarkBloc>().add(
+                                      OnToggleSelectBookmark(recipe.id),
+                                    );
+                                  },
+                                ),
                                 ClipRRect(
-                                  borderRadius: BorderRadius.circular(8),
+                                  borderRadius: BorderRadius.circular(
+                                    AppRadius.sm,
+                                  ),
 
                                   child: Image.network(
                                     recipe.image,
@@ -158,7 +173,7 @@ class BookmarkPage extends StatelessWidget {
                                   ),
                                 ),
 
-                                const SizedBox(width: 12),
+                                const SizedBox(width: AppSpacing.md),
 
                                 Expanded(
                                   child: Column(
@@ -170,53 +185,76 @@ class BookmarkPage extends StatelessWidget {
                                         recipe.title,
                                         maxLines: 2,
                                         overflow: TextOverflow.ellipsis,
+                                        style: Theme.of(
+                                          context,
+                                        ).textTheme.titleMedium,
                                       ),
-
-                                      Text(recipe.category),
+                                      const SizedBox(height: AppSpacing.xs),
+                                      Text(
+                                        recipe.category,
+                                        style: Theme.of(
+                                          context,
+                                        ).textTheme.bodySmall,
+                                      ),
                                     ],
                                   ),
                                 ),
-                              ],
-                            ),
 
-                            trailing: IconButton(
-                              onPressed: () {
-                                showDialog(
-                                  context: context,
+                                IconButton(
+                                  onPressed: () {
+                                    showDialog(
+                                      context: context,
 
-                                  builder: (dialogContext) {
-                                    return AlertDialog(
-                                      title: const Text("Remove Bookmark"),
+                                      builder: (dialogContext) {
+                                        return AlertDialog(
+                                          title: const Text(
+                                            "Remove Bookmark",
+                                          ),
 
-                                      content: Text("Remove ${recipe.title} ?"),
+                                          content: Text(
+                                            "Remove ${recipe.title} ?",
+                                          ),
 
-                                      actions: [
-                                        TextButton(
-                                          onPressed: () {
-                                            Navigator.pop(dialogContext);
-                                          },
+                                          actions: [
+                                            TextButton(
+                                              onPressed: () {
+                                                Navigator.pop(dialogContext);
+                                              },
 
-                                          child: const Text("Cancel"),
-                                        ),
+                                              child: const Text("Cancel"),
+                                            ),
 
-                                        ElevatedButton(
-                                          onPressed: () {
-                                            context.read<BookmarkBloc>().add(
-                                              OnToggleBookmark(recipe),
-                                            );
+                                            ElevatedButton(
+                                              style: ElevatedButton.styleFrom(
+                                                backgroundColor:
+                                                    AppColors.danger,
+                                              ),
+                                              onPressed: () {
+                                                context
+                                                    .read<BookmarkBloc>()
+                                                    .add(
+                                                      OnToggleBookmark(
+                                                        recipe,
+                                                      ),
+                                                    );
 
-                                            Navigator.pop(dialogContext);
-                                          },
+                                                Navigator.pop(dialogContext);
+                                              },
 
-                                          child: const Text("Remove"),
-                                        ),
-                                      ],
+                                              child: const Text("Remove"),
+                                            ),
+                                          ],
+                                        );
+                                      },
                                     );
                                   },
-                                );
-                              },
 
-                              icon: const Icon(Icons.close, color: Colors.red),
+                                  icon: const Icon(
+                                    Icons.close,
+                                    color: AppColors.danger,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         );

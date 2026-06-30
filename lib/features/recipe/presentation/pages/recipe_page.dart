@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:recipe_app/core/theme/app_theme.dart';
 import 'package:recipe_app/features/recipe/presentation/bloc/recipe_random_bloc/recipe_random_bloc.dart';
 import 'package:recipe_app/injection.dart';
 import 'package:recipe_app/features/recipe/presentation/bloc/recipe_bloc/recipe_bloc.dart';
@@ -13,22 +14,29 @@ class RecipePage extends StatelessWidget {
   const RecipePage({super.key});
 
   Widget _categoryItem(BuildContext context, String category, String selected) {
+    final isSelected = selected == category;
     return GestureDetector(
       onTap: () {
         context.read<RecipeBloc>().add(OnSelectCategory(category));
       },
-      child: Container(
-        margin: const EdgeInsets.only(right: 12),
-        padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        margin: const EdgeInsets.only(right: AppSpacing.sm),
+        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
         decoration: BoxDecoration(
-          color: selected == category ? Colors.orange : Colors.grey.shade300,
-          borderRadius: BorderRadius.circular(20),
+          color: isSelected ? AppColors.primary : AppColors.surface,
+          borderRadius: BorderRadius.circular(AppRadius.pill),
+          border: Border.all(
+            color: isSelected ? AppColors.primary : AppColors.border,
+          ),
         ),
         alignment: Alignment.center,
         child: Text(
           category,
           style: TextStyle(
-            color: selected == category ? Colors.white : Colors.black54,
+            color: isSelected ? Colors.white : AppColors.textSecondary,
+            fontWeight: FontWeight.w600,
+            fontSize: 13,
           ),
         ),
       ),
@@ -39,14 +47,14 @@ class RecipePage extends StatelessWidget {
 
   Widget _shimmerBox({double? width, double? height, BorderRadius? radius}) {
     return Shimmer.fromColors(
-      baseColor: Colors.grey.shade300,
-      highlightColor: Colors.grey.shade100,
+      baseColor: AppColors.surfaceAlt,
+      highlightColor: AppColors.background,
       child: Container(
         width: width,
         height: height,
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: radius ?? BorderRadius.circular(8),
+          color: AppColors.surface,
+          borderRadius: radius ?? BorderRadius.circular(AppRadius.sm),
         ),
       ),
     );
@@ -54,16 +62,19 @@ class RecipePage extends StatelessWidget {
 
   Widget _randomShimmer() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.lg,
+        vertical: AppSpacing.md,
+      ),
       child: Shimmer.fromColors(
-        baseColor: Colors.grey.shade300,
-        highlightColor: Colors.grey.shade100,
+        baseColor: AppColors.surfaceAlt,
+        highlightColor: AppColors.background,
         child: Container(
           width: double.infinity,
           height: 160,
           decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
+            color: AppColors.surface,
+            borderRadius: BorderRadius.circular(AppRadius.lg),
           ),
         ),
       ),
@@ -76,17 +87,20 @@ class RecipePage extends StatelessWidget {
         itemCount: 6,
         itemBuilder: (context, index) {
           return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.lg,
+              vertical: AppSpacing.sm,
+            ),
             child: Row(
               children: [
                 _shimmerBox(width: 60, height: 60),
-                const SizedBox(width: 12),
+                const SizedBox(width: AppSpacing.md),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       _shimmerBox(height: 12),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: AppSpacing.sm),
                       _shimmerBox(width: 120, height: 10),
                     ],
                   ),
@@ -101,18 +115,18 @@ class RecipePage extends StatelessWidget {
 
   Widget _categoryShimmer() {
     return SizedBox(
-      height: 50,
+      height: 40,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 16),
+        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
         itemCount: 6,
         itemBuilder: (context, index) {
           return Padding(
-            padding: const EdgeInsets.only(right: 12),
+            padding: const EdgeInsets.only(right: AppSpacing.sm),
             child: _shimmerBox(
               width: 80,
               height: 30,
-              radius: BorderRadius.circular(20),
+              radius: BorderRadius.circular(AppRadius.pill),
             ),
           );
         },
@@ -130,14 +144,9 @@ class RecipePage extends StatelessWidget {
         ),
       ],
       child: Scaffold(
-        backgroundColor: Color.fromARGB(255, 252, 246, 246),
         // ================== Appbar ===================
         appBar: AppBar(
-          title: const Text(
-            'EasyRecipe',
-            style: TextStyle(color: Colors.white),
-          ),
-          backgroundColor: Colors.orange,
+          title: const Text('EasyRecipe'),
           actions: [
             IconButton(
               onPressed: () {
@@ -173,17 +182,17 @@ class RecipePage extends StatelessWidget {
                     children: [
                       // SEARCH SHIMMER
                       Padding(
-                        padding: const EdgeInsets.all(16),
+                        padding: const EdgeInsets.all(AppSpacing.lg),
                         child: _shimmerBox(
                           height: 55,
-                          radius: BorderRadius.circular(12),
+                          radius: BorderRadius.circular(AppRadius.md),
                         ),
                       ),
 
                       // CATEGORY SHIMMER
                       _categoryShimmer(),
 
-                      const SizedBox(height: 12),
+                      const SizedBox(height: AppSpacing.md),
 
                       // RANDOM SHIMMER (tetap pakai bloc builder style)
                       _randomShimmer(),
@@ -202,13 +211,13 @@ class RecipePage extends StatelessWidget {
                     children: [
                       // Search Bar
                       Padding(
-                        padding: const EdgeInsets.all(16),
+                        padding: const EdgeInsets.all(AppSpacing.lg),
                         child: TextField(
-                          decoration: InputDecoration(
+                          decoration: const InputDecoration(
                             hintText: 'Search recipe...',
-                            prefixIcon: const Icon(Icons.search),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
+                            prefixIcon: Icon(
+                              Icons.search,
+                              color: AppColors.textMuted,
                             ),
                           ),
                           onSubmitted: (value) {
@@ -218,27 +227,26 @@ class RecipePage extends StatelessWidget {
                       ),
                       // Category Title
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: AppSpacing.lg,
+                        ),
                         child: Align(
                           alignment: Alignment.centerLeft,
                           child: Text(
                             "Category",
-                            style: TextStyle(
-                              fontSize:
-                                  MediaQuery.of(context).size.width * 0.045,
-                              fontWeight: FontWeight.w400,
-                              color: Colors.black87,
-                            ),
+                            style: Theme.of(context).textTheme.titleMedium,
                           ),
                         ),
                       ),
                       // Category
-                      const SizedBox(height: 10),
+                      const SizedBox(height: AppSpacing.sm),
                       SizedBox(
-                        height: 50,
+                        height: 40,
                         child: ListView(
                           scrollDirection: Axis.horizontal,
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: AppSpacing.lg,
+                          ),
                           children: [
                             _categoryItem(
                               context,
@@ -301,22 +309,17 @@ class RecipePage extends StatelessWidget {
                       // Random Recipe Title
                       Padding(
                         padding: const EdgeInsets.only(
-                          left: 16,
-                          right: 16,
-                          top: 16,
-                          bottom: 2,
+                          left: AppSpacing.lg,
+                          right: AppSpacing.lg,
+                          top: AppSpacing.lg,
+                          bottom: AppSpacing.xs,
                         ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
                               "Random Recipe",
-                              style: TextStyle(
-                                fontSize:
-                                    MediaQuery.of(context).size.width * 0.045,
-                                fontWeight: FontWeight.w400,
-                                color: Colors.black87,
-                              ),
+                              style: Theme.of(context).textTheme.titleMedium,
                             ),
 
                             IconButton(
@@ -329,7 +332,7 @@ class RecipePage extends StatelessWidget {
                               },
                               icon: const Icon(
                                 Icons.casino_rounded,
-                                color: Colors.orange,
+                                color: AppColors.primary,
                                 size: 20,
                               ),
                             ),
@@ -338,18 +341,18 @@ class RecipePage extends StatelessWidget {
                       ),
                       // Random Recipe
                       BlocBuilder<RandomRecipeBloc, RandomRecipeState>(
-                        builder: (context, state) {
-                          if (state is RandomRecipeLoading) {
+                        builder: (context, randomState) {
+                          if (randomState is RandomRecipeLoading) {
                             return _randomShimmer();
                           }
 
-                          if (state is RandomRecipeLoaded) {
-                            final recipe = state.recipe;
+                          if (randomState is RandomRecipeLoaded) {
+                            final recipe = randomState.recipe;
 
                             return Padding(
                               padding: const EdgeInsets.symmetric(
-                                horizontal: 16,
-                                vertical: 12,
+                                horizontal: AppSpacing.lg,
+                                vertical: AppSpacing.md,
                               ),
                               child: GestureDetector(
                                 onTap: () {
@@ -359,16 +362,25 @@ class RecipePage extends StatelessWidget {
                                   width: double.infinity,
                                   height: 160,
                                   decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(16),
+                                    borderRadius: BorderRadius.circular(
+                                      AppRadius.lg,
+                                    ),
                                     image: DecorationImage(
                                       image: NetworkImage(recipe.image),
                                       fit: BoxFit.cover,
                                     ),
+                                    boxShadow: AppColors.softShadow(
+                                      opacity: 0.12,
+                                    ),
                                   ),
                                   child: Container(
-                                    padding: const EdgeInsets.all(12),
+                                    padding: const EdgeInsets.all(
+                                      AppSpacing.md,
+                                    ),
                                     decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(16),
+                                      borderRadius: BorderRadius.circular(
+                                        AppRadius.lg,
+                                      ),
                                       gradient: LinearGradient(
                                         begin: Alignment.bottomCenter,
                                         end: Alignment.topCenter,
@@ -390,7 +402,8 @@ class RecipePage extends StatelessWidget {
                                           style: const TextStyle(
                                             color: Colors.white,
                                             fontSize: 16,
-                                            fontWeight: FontWeight.bold,
+                                            fontWeight: FontWeight.w700,
+                                            letterSpacing: -0.2,
                                           ),
                                         ),
                                         const SizedBox(height: 4),
@@ -401,6 +414,7 @@ class RecipePage extends StatelessWidget {
                                               alpha: 0.8,
                                             ),
                                             fontSize: 12,
+                                            fontWeight: FontWeight.w500,
                                           ),
                                         ),
                                       ],
@@ -415,45 +429,106 @@ class RecipePage extends StatelessWidget {
                         },
                       ),
 
-                      // List Tile
+                      // Recipe List — only this part scrolls.
+                      // ClipRect guarantees items never paint outside this
+                      // area, even during fast scroll/overscroll, so the
+                      // fixed header above is never visually overlapped.
                       Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                          child: ListView.builder(
-                            itemCount: state.recipes.length,
-                            itemBuilder: (context, index) {
-                              final recipe = state.recipes[index];
-                              return Card(
-                                color: Colors.white,
-                                shadowColor: Colors.grey,
-                                margin: const EdgeInsetsDirectional.symmetric(
-                                  horizontal: 2,
-                                  vertical: 4,
-                                ),
-                                child: ListTile(
-                                  onTap: () {
-                                    context.push('/detail/${recipe.id}');
-                                  },
-                                  leading: ClipRRect(
-                                    borderRadius: BorderRadius.circular(8),
-                                    child: Image.network(
-                                      recipe.image,
-                                      width: 60,
-                                      height: 60,
-                                      fit: BoxFit.cover,
+                        child: ClipRect(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: AppSpacing.lg,
+                            ),
+                            child: ListView.separated(
+                              clipBehavior: Clip.hardEdge,
+                              padding: const EdgeInsets.only(
+                                top: AppSpacing.sm,
+                                bottom: AppSpacing.lg,
+                              ),
+                              itemCount: state.recipes.length,
+                              separatorBuilder: (_, __) =>
+                                  const SizedBox(height: AppSpacing.sm),
+                              itemBuilder: (context, index) {
+                                final recipe = state.recipes[index];
+                                return Material(
+                                  color: AppColors.surface,
+                                  clipBehavior: Clip.antiAlias,
+                                  borderRadius: BorderRadius.circular(
+                                    AppRadius.md,
+                                  ),
+                                  child: InkWell(
+                                    onTap: () {
+                                      context.push('/detail/${recipe.id}');
+                                    },
+                                    child: Container(
+                                      padding: const EdgeInsets.all(
+                                        AppSpacing.sm,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        border: Border.all(
+                                          color: AppColors.border,
+                                        ),
+                                        borderRadius: BorderRadius.circular(
+                                          AppRadius.md,
+                                        ),
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(
+                                                  AppRadius.sm,
+                                                ),
+                                            child: Image.network(
+                                              recipe.image,
+                                              width: 68,
+                                              height: 68,
+                                              fit: BoxFit.cover,
+                                            ),
+                                          ),
+                                          const SizedBox(
+                                            width: AppSpacing.md,
+                                          ),
+                                          Expanded(
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  recipe.title,
+                                                  maxLines: 1,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                  style: Theme.of(context)
+                                                      .textTheme
+                                                      .titleMedium,
+                                                ),
+                                                if (state.selectedCategory ==
+                                                    'All') ...[
+                                                  const SizedBox(
+                                                    height: AppSpacing.xs,
+                                                  ),
+                                                  Text(
+                                                    recipe.category,
+                                                    style: Theme.of(context)
+                                                        .textTheme
+                                                        .bodySmall,
+                                                  ),
+                                                ],
+                                              ],
+                                            ),
+                                          ),
+                                          const Icon(
+                                            Icons.chevron_right,
+                                            color: AppColors.textMuted,
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                   ),
-                                  title: Text(recipe.title),
-                                  subtitle: state.selectedCategory == 'All'
-                                      ? Text(recipe.category)
-                                      : null,
-                                  // trailing: IconButton(
-                                  //   onPressed: () {},
-                                  //   icon: Icon(Icons.bookmark_border),
-                                  // ),
-                                ),
-                              );
-                            },
+                                );
+                              },
+                            ),
                           ),
                         ),
                       ),
