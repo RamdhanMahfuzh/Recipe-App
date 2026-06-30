@@ -14,9 +14,9 @@ Simple mobile apps for food recipe, using flutterbloc state management, API call
 
 # ScreenShot
 <p align="center">
-<img width="334" height="735" alt="image" src="https://github.com/user-attachments/assets/61c6d61f-581c-46a9-ac0b-6c3741afb6b1" />
-<img width="334" height="735" alt="image" src="https://github.com/user-attachments/assets/e5b743cc-9843-4461-bbf3-d5ffa84adc01" />
-<img width="334" height="735" alt="image" src="https://github.com/user-attachments/assets/a7b265ea-c4fe-476d-a0b3-2524f258d9d6" />
+<img width="1082" height="2402" alt="localhost_50589_(Pixel 7)" src="https://github.com/user-attachments/assets/2e31cb6f-0d1c-47dc-ac51-f1b9ecf8edaa" />
+<img width="1082" height="2402" alt="localhost_50589_(Pixel 7) (2)" src="https://github.com/user-attachments/assets/37e0df2e-504c-4b32-bca5-565683adcc1b" />
+<img width="1082" height="2402" alt="localhost_50589_(Pixel 7) (1)" src="https://github.com/user-attachments/assets/740b8ae4-575a-422b-bb30-dd589652d8cc" />
 </p>
 
 # APK Download
