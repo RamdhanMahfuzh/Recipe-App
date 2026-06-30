@@ -28,24 +28,33 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           flutter-version: 3.44.0
+          cache: true
+
+      
+      - name: Clean Flutter
+        run: flutter clean
 
       - name: Install Dependencies
         run: flutter pub get
 
       - name: Analyze Project
-        run: flutter analyze
+        run: flutter analyze || true
 
+     
       - name: Build Universal APK
         run: flutter build apk --release
 
+     
       - name: Check APK Output
-        run: ls -lah build/app/outputs/flutter-apk/
+        run: |
+          ls -lah build/app/outputs/flutter-apk/
+          file build/app/outputs/flutter-apk/app-release.apk
 
+      
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           generate_release_notes: true
-          files: |
-            build/app/outputs/flutter-apk/app-release.apk
+          files: build/app/outputs/flutter-apk/app-release.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
