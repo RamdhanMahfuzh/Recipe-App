@@ -119,7 +119,7 @@ class BookmarkPage extends StatelessWidget {
                       padding: const EdgeInsets.all(AppSpacing.lg),
 
                       itemCount: state.bookmarks.length,
-                      separatorBuilder: (_, __) =>
+                      separatorBuilder: (_, _) =>
                           const SizedBox(height: AppSpacing.sm),
 
                       itemBuilder: (context, index) {

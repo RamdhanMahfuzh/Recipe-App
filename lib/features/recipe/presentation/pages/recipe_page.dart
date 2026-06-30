@@ -446,7 +446,7 @@ class RecipePage extends StatelessWidget {
                                 bottom: AppSpacing.lg,
                               ),
                               itemCount: state.recipes.length,
-                              separatorBuilder: (_, __) =>
+                              separatorBuilder: (_, _) =>
                                   const SizedBox(height: AppSpacing.sm),
                               itemBuilder: (context, index) {
                                 final recipe = state.recipes[index];
