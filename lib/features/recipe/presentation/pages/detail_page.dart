@@ -1,12 +1,16 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:recipe_app/core/theme/app_theme.dart';
 import 'package:recipe_app/features/recipe/domain/entities/recipe_entity.dart';
 import 'package:recipe_app/features/recipe/presentation/bloc/bookmark_bloc/bookmark_bloc.dart';
-import 'package:recipe_app/injection.dart';
 import 'package:recipe_app/features/recipe/presentation/bloc/recipe_detail_bloc/recipe_detail_bloc.dart';
-import 'package:shimmer/shimmer.dart';
+import 'package:recipe_app/features/recipe/presentation/widgets/category_badge.dart';
+import 'package:recipe_app/features/recipe/presentation/widgets/ingredient_item.dart';
+import 'package:recipe_app/features/recipe/presentation/widgets/instructions_box.dart';
+import 'package:recipe_app/features/recipe/presentation/widgets/recipe_shimmer.dart';
+import 'package:recipe_app/injection.dart';
 
 class DetailPage extends StatelessWidget {
   final String? id;
@@ -14,112 +18,52 @@ class DetailPage extends StatelessWidget {
 
   const DetailPage({super.key, this.id, this.recipe});
 
-  // ================= SHIMMER HELPERS =================
+  @override
+  Widget build(BuildContext context) {
+    if (recipe != null) {
+      return MultiBlocProvider(
+        providers: [
+          BlocProvider(
+            create: (_) => sl<BookmarkBloc>()..add(OnGetBookmarks()),
+          ),
+        ],
+        child: _DetailContent(recipe: recipe!),
+      );
+    }
 
-  Widget _shimmerBox({double? width, double? height, BorderRadius? radius}) {
-    return Shimmer.fromColors(
-      baseColor: AppColors.surfaceAlt,
-      highlightColor: AppColors.background,
-      child: Container(
-        width: width,
-        height: height,
-        decoration: BoxDecoration(
-          color: AppColors.surface,
-          borderRadius: radius ?? BorderRadius.circular(AppRadius.sm),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (_) => sl<RecipeDetailBloc>()..add(OnGetRecipeDetail(id!)),
+        ),
+        BlocProvider(create: (_) => sl<BookmarkBloc>()..add(OnGetBookmarks())),
+      ],
+      child: Scaffold(
+        body: BlocBuilder<RecipeDetailBloc, RecipeDetailState>(
+          builder: (context, state) {
+            if (state is RecipeDetailLoading) {
+              return const _DetailShimmer();
+            }
+            if (state is RecipeDetailLoaded) {
+              return _DetailContent(recipe: state.recipe);
+            }
+            return const SizedBox();
+          },
         ),
       ),
     );
   }
+}
 
-  Widget _shimmerDetail() {
-    return CustomScrollView(
-      slivers: [
-        SliverAppBar(
-          expandedHeight: 280,
-          pinned: true,
-          backgroundColor: Colors.transparent,
+// ========================= Detail Content =========================
 
-          leading: const BackButton(color: Colors.white),
+class _DetailContent extends StatelessWidget {
+  final RecipeEntity recipe;
 
-          flexibleSpace: FlexibleSpaceBar(
-            background: Shimmer.fromColors(
-              baseColor: AppColors.surfaceAlt,
+  const _DetailContent({required this.recipe});
 
-              highlightColor: AppColors.background,
-
-              child: Container(color: AppColors.surface),
-            ),
-          ),
-        ),
-
-        SliverToBoxAdapter(
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-
-              children: [
-                _shimmerBox(height: 28, width: 200),
-
-                const SizedBox(height: 14),
-
-                _shimmerBox(
-                  height: 30,
-                  width: 120,
-                  radius: BorderRadius.circular(20),
-                ),
-
-                const SizedBox(height: 24),
-
-                _shimmerBox(height: 22, width: 150),
-
-                const SizedBox(height: 12),
-
-                Column(
-                  children: List.generate(
-                    5,
-                    (index) => Padding(
-                      padding: const EdgeInsets.only(bottom: 10),
-
-                      child: Row(
-                        children: [
-                          _shimmerBox(width: 8, height: 8),
-
-                          const SizedBox(width: 10),
-
-                          Expanded(child: _shimmerBox(height: 12)),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 30),
-
-                _shimmerBox(height: 22, width: 160),
-
-                const SizedBox(height: 12),
-
-                _shimmerBox(
-                  height: 180,
-                  width: double.infinity,
-
-                  radius: BorderRadius.circular(12),
-                ),
-
-                const SizedBox(height: 40),
-              ],
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  // ================= DETAIL UI =================
-
-  Widget _buildDetailContent(BuildContext context, RecipeEntity recipe) {
+  @override
+  Widget build(BuildContext context) {
     return BlocListener<BookmarkBloc, BookmarkState>(
       listener: (context, state) {
         if (state is BookmarkActionSuccess) {
@@ -130,24 +74,19 @@ class DetailPage extends StatelessWidget {
                 backgroundColor: state.isAdded
                     ? AppColors.success
                     : AppColors.textPrimary,
-
                 duration: const Duration(seconds: 2),
-
                 content: Row(
                   children: [
                     Icon(
                       state.isAdded ? Icons.check_circle : Icons.delete,
-
                       color: Colors.white,
                     ),
-
                     const SizedBox(width: 10),
-
                     Expanded(
                       child: Text(
                         state.isAdded
-                            ? "Recipe successfully bookmarked"
-                            : "Recipe removed from bookmarks",
+                            ? 'Recipe successfully bookmarked'
+                            : 'Recipe removed from bookmarks',
                       ),
                     ),
                   ],
@@ -156,71 +95,71 @@ class DetailPage extends StatelessWidget {
             );
         }
       },
-
       child: Scaffold(
         body: CustomScrollView(
           slivers: [
+            // ---- Header Image ----
             SliverAppBar(
               expandedHeight: 280,
               pinned: true,
-
               backgroundColor: AppColors.primary,
-
               leading: IconButton(
-                onPressed: () {
-                  context.pop();
-                },
-
+                onPressed: () => context.pop(),
                 icon: const Icon(Icons.arrow_back, color: Colors.white),
               ),
-
               flexibleSpace: FlexibleSpaceBar(
-                background: Image.network(recipe.image, fit: BoxFit.cover),
+                background: CachedNetworkImage(
+                  imageUrl: recipe.image,
+                  fit: BoxFit.cover,
+                  placeholder: (_, __) =>
+                      Container(color: AppColors.surfaceAlt),
+                  errorWidget: (_, __, ___) => Container(
+                    color: AppColors.surfaceAlt,
+                    child: const Icon(
+                      Icons.image_not_supported_outlined,
+                      color: AppColors.textMuted,
+                      size: 32,
+                    ),
+                  ),
+                ),
               ),
             ),
 
+            // ---- Content ----
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.all(AppSpacing.lg),
-
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-
                   children: [
+                    // Title + bookmark button
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
-
                       children: [
                         Expanded(
                           child: Text(
                             recipe.title,
-
-                            style: Theme.of(context).textTheme.headlineLarge,
+                            style:
+                                Theme.of(context).textTheme.headlineLarge,
                           ),
                         ),
-
                         BlocBuilder<BookmarkBloc, BookmarkState>(
                           builder: (context, state) {
                             final bookmarks = state is BookmarkLoaded
                                 ? state.bookmarks
                                 : <RecipeEntity>[];
-
-                            final isBookmarked = bookmarks.any(
-                              (e) => e.id == recipe.id,
-                            );
-
+                            final isBookmarked =
+                                bookmarks.any((e) => e.id == recipe.id);
                             return IconButton(
                               onPressed: () {
                                 context.read<BookmarkBloc>().add(
                                   OnToggleBookmark(recipe),
                                 );
                               },
-
                               icon: Icon(
                                 isBookmarked
                                     ? Icons.bookmark
                                     : Icons.bookmark_border,
-
                                 color: isBookmarked
                                     ? AppColors.primary
                                     : AppColors.textSecondary,
@@ -232,98 +171,28 @@ class DetailPage extends StatelessWidget {
                     ),
 
                     const SizedBox(height: AppSpacing.md),
+                    CategoryBadge(label: recipe.category),
+                    const SizedBox(height: AppSpacing.xl),
 
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: AppSpacing.md,
-                        vertical: AppSpacing.xs,
-                      ),
+                    Text(
+                      'Ingredients',
+                      style: Theme.of(context).textTheme.headlineMedium,
+                    ),
+                    const SizedBox(height: AppSpacing.md),
 
-                      decoration: BoxDecoration(
-                        color: AppColors.primarySoft,
-
-                        borderRadius: BorderRadius.circular(AppRadius.pill),
-                      ),
-
-                      child: Text(
-                        recipe.category,
-
-                        style: const TextStyle(
-                          color: AppColors.primaryDark,
-                          fontWeight: FontWeight.w600,
-                          fontSize: 13,
-                        ),
-                      ),
+                    ...recipe.ingredients.map(
+                      (ingredient) => IngredientItem(ingredient: ingredient),
                     ),
 
                     const SizedBox(height: AppSpacing.xl),
 
                     Text(
-                      "Ingredients",
-
+                      'Instructions',
                       style: Theme.of(context).textTheme.headlineMedium,
                     ),
-
                     const SizedBox(height: AppSpacing.md),
 
-                    ...recipe.ingredients.map((ingredient) {
-                      return Padding(
-                        padding: const EdgeInsets.only(
-                          bottom: AppSpacing.sm,
-                        ),
-
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Container(
-                              margin: const EdgeInsets.only(top: 6),
-                              width: 6,
-                              height: 6,
-                              decoration: const BoxDecoration(
-                                color: AppColors.primary,
-                                shape: BoxShape.circle,
-                              ),
-                            ),
-
-                            const SizedBox(width: AppSpacing.md),
-
-                            Expanded(
-                              child: Text(
-                                ingredient,
-                                style: Theme.of(context).textTheme.bodyLarge,
-                              ),
-                            ),
-                          ],
-                        ),
-                      );
-                    }),
-
-                    const SizedBox(height: AppSpacing.xl),
-
-                    Text(
-                      "Instructions",
-
-                      style: Theme.of(context).textTheme.headlineMedium,
-                    ),
-
-                    const SizedBox(height: AppSpacing.md),
-
-                    Container(
-                      padding: const EdgeInsets.all(AppSpacing.lg),
-
-                      decoration: BoxDecoration(
-                        color: AppColors.surfaceAlt,
-
-                        borderRadius: BorderRadius.circular(AppRadius.lg),
-                      ),
-
-                      child: Text(
-                        recipe.instructions,
-
-                        style: Theme.of(context).textTheme.bodyLarge,
-                      ),
-                    ),
-
+                    InstructionsBox(instructions: recipe.instructions),
                     const SizedBox(height: AppSpacing.xxl),
                   ],
                 ),
@@ -334,49 +203,68 @@ class DetailPage extends StatelessWidget {
       ),
     );
   }
+}
+
+// ========================= Shimmer =========================
+
+class _DetailShimmer extends StatelessWidget {
+  const _DetailShimmer();
 
   @override
   Widget build(BuildContext context) {
-    // ================= OFFLINE MODE =================
-
-    if (recipe != null) {
-      return MultiBlocProvider(
-        providers: [
-          BlocProvider(
-            create: (_) => sl<BookmarkBloc>()..add(OnGetBookmarks()),
+    return CustomScrollView(
+      slivers: [
+        SliverAppBar(
+          expandedHeight: 280,
+          pinned: true,
+          backgroundColor: Colors.transparent,
+          leading: const BackButton(color: Colors.white),
+          flexibleSpace: FlexibleSpaceBar(
+            background: Container(color: AppColors.surfaceAlt),
           ),
-        ],
-
-        child: _buildDetailContent(context, recipe!),
-      );
-    }
-
-    // ================= ONLINE MODE =================
-
-    return MultiBlocProvider(
-      providers: [
-        BlocProvider(
-          create: (_) => sl<RecipeDetailBloc>()..add(OnGetRecipeDetail(id!)),
         ),
-
-        BlocProvider(create: (_) => sl<BookmarkBloc>()..add(OnGetBookmarks())),
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpacing.lg),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                ShimmerBox(height: 28, width: 200),
+                const SizedBox(height: 14),
+                ShimmerBox(
+                  height: 30,
+                  width: 120,
+                  radius: BorderRadius.circular(AppRadius.pill),
+                ),
+                const SizedBox(height: 24),
+                ShimmerBox(height: 22, width: 150),
+                const SizedBox(height: 12),
+                ...List.generate(
+                  5,
+                  (_) => Padding(
+                    padding: const EdgeInsets.only(bottom: 10),
+                    child: Row(
+                      children: [
+                        const ShimmerBox(width: 8, height: 8),
+                        const SizedBox(width: 10),
+                        const Expanded(child: ShimmerBox(height: 12)),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 30),
+                ShimmerBox(height: 22, width: 160),
+                const SizedBox(height: 12),
+                ShimmerBox(
+                  height: 180,
+                  width: double.infinity,
+                  radius: BorderRadius.circular(AppRadius.lg),
+                ),
+              ],
+            ),
+          ),
+        ),
       ],
-
-      child: Scaffold(
-        body: BlocBuilder<RecipeDetailBloc, RecipeDetailState>(
-          builder: (context, state) {
-            if (state is RecipeDetailLoading) {
-              return _shimmerDetail();
-            }
-
-            if (state is RecipeDetailLoaded) {
-              return _buildDetailContent(context, state.recipe);
-            }
-
-            return const SizedBox();
-          },
-        ),
-      ),
     );
   }
 }
