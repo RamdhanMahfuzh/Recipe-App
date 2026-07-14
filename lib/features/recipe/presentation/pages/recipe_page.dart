@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 import 'package:recipe_app/core/theme/app_theme.dart';
 import 'package:recipe_app/features/recipe/presentation/bloc/recipe_bloc/recipe_bloc.dart';
 import 'package:recipe_app/features/recipe/presentation/bloc/recipe_random_bloc/recipe_random_bloc.dart';
-import 'package:recipe_app/features/recipe/presentation/widgets/bookmark_empty_state.dart';
 import 'package:recipe_app/features/recipe/presentation/widgets/category_list.dart';
 import 'package:recipe_app/features/recipe/presentation/widgets/empty_recipe_widget.dart';
 import 'package:recipe_app/features/recipe/presentation/widgets/offline_recipe_widget.dart';
